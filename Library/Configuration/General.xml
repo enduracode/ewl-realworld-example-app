@@ -2,7 +2,7 @@
 <systemGeneralConfiguration xmlns="http://redstapler.biz" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                             xsi:schemaLocation="http://redstapler.biz http://ewl.enterpriseweblibrary.org/ConfigurationSchemas/SystemGeneral">
 	<systemName>EWL RealWorld</systemName>
-	<systemShortName>EwlRealworld</systemShortName>
+	<systemShortName>EwlRealWorld</systemShortName>
 	<WebApplications>
 		<Application>
 			<Name>Website</Name>
