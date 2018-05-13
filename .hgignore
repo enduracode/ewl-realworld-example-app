@@ -1,0 +1,27 @@
+# EWL-REGION
+syntax: glob
+
+.vs/EWL RealWorld/v15/.suo
+.vs/EWL RealWorld/v15/sqlite3/
+.vs/EWL RealWorld/v15/Server/sqlite3/
+packages/
+EWL RealWorld.sln.DotSettings.user
+Error Log.txt
+*.csproj.user
+*.ewlt.cs
+
+Solution Files/bin/
+Solution Files/obj/
+
+Library/bin/
+Library/obj/
+Library/Configuration/Aspose Licenses/
+Library/Generated Code/
+
+Website/bin/
+Website/obj/
+Website/Ewf/
+Website/Standard Library Files.xml
+Website/Generated Code/
+
+# END-EWL-REGION
