@@ -7,4 +7,5 @@
 			<EmailAddress>jane.doe@example.com</EmailAddress>
 		</administrator>
 	</administrators>
+	<database xsi:type="SqlServerDatabase" />
 </installationStandardConfiguration>
