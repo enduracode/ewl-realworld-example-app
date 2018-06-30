@@ -2,8 +2,8 @@
 
 namespace EwlRealWorld.Library.Configuration.Providers {
 	internal class General: SystemGeneralProvider {
-		string SystemGeneralProvider.IntermediateLogInPassword { get { return "your-password"; } }
-		string SystemGeneralProvider.EmailDefaultFromName { get { return "Organization Name"; } }
-		string SystemGeneralProvider.EmailDefaultFromAddress { get { return "contact@example.com"; } }
+		string SystemGeneralProvider.IntermediateLogInPassword => "password";
+		string SystemGeneralProvider.EmailDefaultFromName => "EWL Team";
+		string SystemGeneralProvider.EmailDefaultFromAddress => "contact@enterpriseweblibrary.org";
 	}
 }
