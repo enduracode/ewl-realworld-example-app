@@ -1,6 +1,7 @@
 # EWL-REGION
 syntax: glob
 
+.vs/EWL RealWorld/DesignTimeBuild/
 .vs/EWL RealWorld/v15/.suo
 .vs/EWL RealWorld/v15/sqlite3/
 .vs/EWL RealWorld/v15/Server/sqlite3/
