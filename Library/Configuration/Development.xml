@@ -8,4 +8,6 @@
 			<NamespaceAndAssemblyName>EwlRealWorld.Website</NamespaceAndAssemblyName>
 		</project>
 	</webProjects>
+	<database>
+	</database>
 </systemDevelopmentConfiguration>

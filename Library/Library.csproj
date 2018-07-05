@@ -155,11 +155,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\Providers\General.cs" />
+    <Compile Include="Configuration\Providers\UserManagement.cs" />
+    <Compile Include="DataAccess\MainSequence.cs" />
     <Compile Include="Generated Code\ISU.cs" />
     <Compile Include="GlobalInitializer.cs" />
     <Compile Include="GlobalStatics.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Configuration\Database Updates.sql" />
     <Content Include="Configuration\Development.xml" />
     <Content Include="Configuration\General.xml" />
     <Content Include="Configuration\Installation\Installations\Development\Standard.xml" />

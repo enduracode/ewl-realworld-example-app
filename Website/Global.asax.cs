@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using EwlRealWorld.Library;
-using EnterpriseWebLibrary;
 using EnterpriseWebLibrary.EnterpriseWebFramework;
+using EwlRealWorld.Library;
+using EwlRealWorld.Website.Pages;
 
 namespace EwlRealWorld.Website {
 	public class Global: EwfApp {
@@ -18,7 +18,7 @@ namespace EwlRealWorld.Website {
 
 
 		protected override IEnumerable<ShortcutUrlResolver> GetShortcutUrlResolvers() {
-			yield break;
+			yield return new ShortcutUrlResolver( "", ConnectionSecurity.SecureIfPossible, () => Home.GetInfo() );
 		}
 	}
 }
