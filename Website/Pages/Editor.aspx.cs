@@ -32,16 +32,8 @@ namespace EwlRealWorld.Website.Pages {
 			FormState.ExecuteWithDataModificationsAndDefaultAction(
 				PostBack.CreateFull(
 						firstModificationMethod: () => {
-							if( !info.ArticleId.HasValue ) {
-								var otherArticles = ArticleRevisionsTableRetrieval.GetRows();
-								for( var suffix = 1;; suffix += 1 ) {
-									var slug = mod.Title.ToUrlSlug() + ( suffix == 1 ? "" : "-{0}".FormatWith( suffix.ToString() ) );
-									if( otherArticles.Any( i => i.Slug == slug ) )
-										continue;
-									mod.Slug = slug;
-									break;
-								}
-							}
+							if( !info.ArticleId.HasValue )
+								mod.Slug = getSuffixedSlug( mod.Title.ToUrlSlug() );
 							mod.Execute();
 						},
 						actionGetter: () => new PostBackAction( Article.GetInfo( mod.ArticleRevisionId ) ) )
@@ -61,6 +53,15 @@ namespace EwlRealWorld.Website.Pages {
 					ph.AddControlsReturnThis( table );
 					EwfUiStatics.SetContentFootActions( new ActionButtonSetup( "Publish Article", new PostBackButton() ) );
 				} );
+		}
+
+		private string getSuffixedSlug( string slug ) {
+			var otherArticles = ArticleRevisionsTableRetrieval.GetRows();
+			for( var suffix = 1;; suffix += 1 ) {
+				var suffixedSlug = slug + ( suffix == 1 ? "" : "-{0}".FormatWith( suffix.ToString() ) );
+				if( otherArticles.All( i => i.Slug != suffixedSlug ) )
+					return suffixedSlug;
+			}
 		}
 	}
 }
