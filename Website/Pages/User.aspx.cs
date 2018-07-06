@@ -50,8 +50,7 @@ namespace EwlRealWorld.Website.Pages {
 
 							logInHiddenFieldsAndMethod?.Item2( mod.UserId );
 						},
-						actionGetter: () =>
-							new PostBackAction( logInHiddenFieldsAndMethod != null ? (PageInfo)Home.GetInfo() : Profile.GetInfo( AppTools.User.UserId, false ) ) )
+						actionGetter: () => new PostBackAction( logInHiddenFieldsAndMethod != null ? (PageInfo)Home.GetInfo() : Profile.GetInfo( AppTools.User.UserId ) ) )
 					.ToCollection(),
 				() => {
 					var table = FormItemBlock.CreateFormItemTable();

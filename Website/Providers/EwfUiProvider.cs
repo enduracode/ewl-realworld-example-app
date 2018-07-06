@@ -28,9 +28,7 @@ namespace EwlRealWorld.Website.Providers {
 						Editor.GetInfo( null ),
 						icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-pencil-square-o" ) ) ),
 					ActionButtonSetup.CreateWithUrl( "Settings", User.GetInfo(), icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-cog" ) ) ),
-					ActionButtonSetup.CreateWithUrl(
-						UsersTableRetrieval.GetRowMatchingId( AppTools.User.UserId ).Username,
-						Profile.GetInfo( AppTools.User.UserId, false ) )
+					ActionButtonSetup.CreateWithUrl( UsersTableRetrieval.GetRowMatchingId( AppTools.User.UserId ).Username, Profile.GetInfo( AppTools.User.UserId ) )
 				}.ToList();
 		}
 	}

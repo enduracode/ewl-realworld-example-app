@@ -2,7 +2,7 @@ using EnterpriseWebLibrary.EnterpriseWebFramework;
 using EwlRealWorld.Library.DataAccess.TableRetrieval;
 
 // Parameter: int userId
-// Parameter: bool showFavorites
+// OptionalParameter: bool showFavorites
 
 namespace EwlRealWorld.Website.Pages {
 	partial class Profile: EwfPage {
