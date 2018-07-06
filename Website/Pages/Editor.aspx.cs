@@ -18,6 +18,8 @@ namespace EwlRealWorld.Website.Pages {
 				if( ArticleId.HasValue )
 					Article = ArticleRevisionsTableRetrieval.GetRowMatchingId( ArticleId.Value );
 			}
+
+			protected override bool userCanAccessResource => AppTools.User != null && ( !ArticleId.HasValue || Article.AuthorId == AppTools.User.UserId );
 		}
 
 		protected override void loadData() {
@@ -26,6 +28,7 @@ namespace EwlRealWorld.Website.Pages {
 				mod = info.Article.ToModificationAsRevision();
 			else {
 				mod = ArticleRevisionsModification.CreateForInsertAsRevision();
+				mod.AuthorId = AppTools.User.UserId;
 				mod.Deleted = false;
 			}
 

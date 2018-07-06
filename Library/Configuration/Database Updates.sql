@@ -49,6 +49,9 @@ create table ArticleRevisions(
 		not null
 		constraint ArticleRevisionsPk primary key
 		constraint ArticleRevisionsArticleRevisionIdFk references Revisions,
+	AuthorId int
+		not null
+		constraint ArticleRevisionsAuthorIdFk references Users,
 	Slug varchar( 100 )
 		not null
 		constraint ArticleRevisionsSlugUnique unique,
