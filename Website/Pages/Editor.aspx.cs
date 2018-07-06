@@ -35,7 +35,7 @@ namespace EwlRealWorld.Website.Pages {
 							if( !info.ArticleId.HasValue ) {
 								var otherArticles = ArticleRevisionsTableRetrieval.GetRows();
 								for( var suffix = 1;; suffix += 1 ) {
-									var slug = "test" + ( suffix == 1 ? "" : "-{0}".FormatWith( suffix.ToString() ) );
+									var slug = mod.Title.ToUrlSlug() + ( suffix == 1 ? "" : "-{0}".FormatWith( suffix.ToString() ) );
 									if( otherArticles.Any( i => i.Slug == slug ) )
 										continue;
 									mod.Slug = slug;
