@@ -9,5 +9,8 @@
 		</project>
 	</webProjects>
 	<database>
+		<revisionHistoryTables>
+			<table>ArticleRevisions</table>
+		</revisionHistoryTables>
 	</database>
 </systemDevelopmentConfiguration>

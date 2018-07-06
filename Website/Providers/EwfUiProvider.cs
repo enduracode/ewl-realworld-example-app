@@ -23,6 +23,10 @@ namespace EwlRealWorld.Website.Providers {
 			return new[]
 				{
 					ActionButtonSetup.CreateWithUrl( "Home", Home.GetInfo() ),
+					ActionButtonSetup.CreateWithUrl(
+						"New Article",
+						Editor.GetInfo( null ),
+						icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-pencil-square-o" ) ) ),
 					ActionButtonSetup.CreateWithUrl( "Settings", User.GetInfo(), icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-cog" ) ) ),
 					ActionButtonSetup.CreateWithUrl(
 						UsersTableRetrieval.GetRowMatchingId( AppTools.User.UserId ).Username,
