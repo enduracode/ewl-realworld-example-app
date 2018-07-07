@@ -1,5 +1,7 @@
 using EnterpriseWebLibrary;
 using EnterpriseWebLibrary.EnterpriseWebFramework;
+using EnterpriseWebLibrary.EnterpriseWebFramework.Controls;
+using EnterpriseWebLibrary.EnterpriseWebFramework.Ui;
 using EwlRealWorld.Library.DataAccess.TableRetrieval;
 using Markdig;
 
@@ -18,7 +20,26 @@ namespace EwlRealWorld.Website.Pages {
 		}
 
 		protected override void loadData() {
-			ph.AddControlsReturnThis( new HtmlBlockContainer( Markdown.ToHtml( info.Article.BodyMarkdown ) ).ToCollection().GetControls() );
+			if( AppTools.User != null && info.Article.AuthorId == AppTools.User.UserId )
+				EwfUiStatics.SetPageActions(
+					ActionButtonSetup.CreateWithUrl(
+						"Edit Article",
+						Editor.GetInfo( info.ArticleId ),
+						icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-pencil" ) ) ),
+					new ActionButtonSetup(
+						"Delete Article",
+						new PostBackButton(
+							postBack: PostBack.CreateFull(
+								id: "delete",
+								firstModificationMethod: () => {
+									var mod = info.Article.ToModificationAsRevision();
+									mod.Deleted = true;
+									mod.Execute();
+								} ) ),
+						icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-trash" ) ) ) );
+
+			ph.AddControlsReturnThis(
+				AppStatics.GetAuthorDisplay( info.Article ).Append( new HtmlBlockContainer( Markdown.ToHtml( info.Article.BodyMarkdown ) ) ).GetControls() );
 		}
 	}
 }

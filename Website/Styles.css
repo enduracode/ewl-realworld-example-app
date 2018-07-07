@@ -1,0 +1,13 @@
+﻿div.author {
+	display: flex;
+	align-items: center;
+}
+div.author ewfImage {
+	margin-right: .4em;
+	width: 2em;
+	height: 2em;
+	border-radius: 1em;
+}
+div.author .date {
+	font-size: .8em;
+}

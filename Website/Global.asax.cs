@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using EnterpriseWebLibrary;
 using EnterpriseWebLibrary.EnterpriseWebFramework;
 using EwlRealWorld.Library;
 using EwlRealWorld.Website.Pages;
@@ -19,6 +21,10 @@ namespace EwlRealWorld.Website {
 
 		protected override IEnumerable<ShortcutUrlResolver> GetShortcutUrlResolvers() {
 			yield return new ShortcutUrlResolver( "", ConnectionSecurity.SecureIfPossible, () => Home.GetInfo() );
+		}
+
+		protected override List<ResourceInfo> GetStyleSheets() {
+			return new StylesCss.Info().ToCollection<ResourceInfo>().ToList();
 		}
 	}
 }

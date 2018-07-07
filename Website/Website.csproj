@@ -191,6 +191,7 @@
     <Content Include="Pages\Home.aspx" />
     <Content Include="Pages\Profile.aspx" />
     <Content Include="Pages\User.aspx" />
+    <Content Include="Styles.css" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
