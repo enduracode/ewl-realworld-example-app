@@ -1,3 +1,4 @@
+using System;
 using EnterpriseWebLibrary;
 using EnterpriseWebLibrary.EnterpriseWebFramework;
 using EnterpriseWebLibrary.EnterpriseWebFramework.Controls;
@@ -14,6 +15,8 @@ namespace EwlRealWorld.Website.Pages {
 
 			protected override void init() {
 				Article = ArticleRevisionsTableRetrieval.GetRowMatchingId( ArticleId );
+				if( Article.Deleted )
+					throw new ApplicationException( "deleted" );
 			}
 
 			public override string ResourceName => Article.Title;
@@ -35,7 +38,8 @@ namespace EwlRealWorld.Website.Pages {
 									var mod = info.Article.ToModificationAsRevision();
 									mod.Deleted = true;
 									mod.Execute();
-								} ) ),
+								},
+								actionGetter: () => new PostBackAction( Home.GetInfo() ) ) ),
 						icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-trash" ) ) ) );
 
 			ph.AddControlsReturnThis(
