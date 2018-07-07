@@ -1,8 +1,10 @@
+using System;
 using System.Linq;
 using EnterpriseWebLibrary;
 using EnterpriseWebLibrary.EnterpriseWebFramework;
 using EnterpriseWebLibrary.EnterpriseWebFramework.Controls;
 using EnterpriseWebLibrary.EnterpriseWebFramework.Ui;
+using EwlRealWorld.Library.DataAccess;
 using EwlRealWorld.Library.DataAccess.Modification;
 using EwlRealWorld.Library.DataAccess.TableRetrieval;
 using Humanizer;
@@ -12,34 +14,36 @@ using Humanizer;
 namespace EwlRealWorld.Website.Pages {
 	partial class Editor: EwfPage {
 		partial class Info {
-			internal ArticleRevisionsTableRetrieval.Row Article { get; private set; }
+			internal ArticlesTableRetrieval.Row Article { get; private set; }
 
 			protected override void init() {
 				if( ArticleId.HasValue )
-					Article = ArticleRevisionsTableRetrieval.GetRowMatchingId( ArticleId.Value );
+					Article = ArticlesTableRetrieval.GetRowMatchingId( ArticleId.Value );
 			}
 
 			protected override bool userCanAccessResource => AppTools.User != null && ( !ArticleId.HasValue || Article.AuthorId == AppTools.User.UserId );
 		}
 
 		protected override void loadData() {
-			ArticleRevisionsModification mod;
+			ArticlesModification mod;
 			if( info.ArticleId.HasValue )
-				mod = info.Article.ToModificationAsRevision();
+				mod = info.Article.ToModification();
 			else {
-				mod = ArticleRevisionsModification.CreateForInsertAsRevision();
+				mod = ArticlesModification.CreateForInsert();
 				mod.AuthorId = AppTools.User.UserId;
-				mod.Deleted = false;
 			}
 
 			FormState.ExecuteWithDataModificationsAndDefaultAction(
 				PostBack.CreateFull(
 						firstModificationMethod: () => {
-							if( !info.ArticleId.HasValue )
+							if( !info.ArticleId.HasValue ) {
+								mod.ArticleId = MainSequence.GetNextValue();
 								mod.Slug = getSuffixedSlug( mod.Title.ToUrlSlug() );
+								mod.CreationDateAndTime = DateTime.UtcNow;
+							}
 							mod.Execute();
 						},
-						actionGetter: () => new PostBackAction( Article.GetInfo( mod.ArticleRevisionId ) ) )
+						actionGetter: () => new PostBackAction( Article.GetInfo( mod.ArticleId ) ) )
 					.ToCollection(),
 				() => {
 					var table = FormItemBlock.CreateFormItemTable();
@@ -59,7 +63,7 @@ namespace EwlRealWorld.Website.Pages {
 		}
 
 		private string getSuffixedSlug( string slug ) {
-			var otherArticles = ArticleRevisionsTableRetrieval.GetRows();
+			var otherArticles = ArticlesTableRetrieval.GetRows();
 			for( var suffix = 1;; suffix += 1 ) {
 				var suffixedSlug = slug + ( suffix == 1 ? "" : "-{0}".FormatWith( suffix.ToString() ) );
 				if( otherArticles.All( i => i.Slug != suffixedSlug ) )

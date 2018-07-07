@@ -154,7 +154,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\Providers\DataAccess.cs" />
     <Compile Include="Configuration\Providers\General.cs" />
     <Compile Include="Configuration\Providers\UserManagement.cs" />
     <Compile Include="DataAccess\MainSequence.cs" />

@@ -3,6 +3,8 @@ using EnterpriseWebLibrary;
 using EnterpriseWebLibrary.EnterpriseWebFramework;
 using EnterpriseWebLibrary.EnterpriseWebFramework.Controls;
 using EnterpriseWebLibrary.EnterpriseWebFramework.Ui;
+using EwlRealWorld.Library.DataAccess.CommandConditions;
+using EwlRealWorld.Library.DataAccess.Modification;
 using EwlRealWorld.Library.DataAccess.TableRetrieval;
 using Markdig;
 
@@ -11,12 +13,10 @@ using Markdig;
 namespace EwlRealWorld.Website.Pages {
 	partial class Article: EwfPage {
 		partial class Info {
-			internal ArticleRevisionsTableRetrieval.Row Article { get; private set; }
+			internal ArticlesTableRetrieval.Row Article { get; private set; }
 
 			protected override void init() {
-				Article = ArticleRevisionsTableRetrieval.GetRowMatchingId( ArticleId );
-				if( Article.Deleted )
-					throw new ApplicationException( "deleted" );
+				Article = ArticlesTableRetrieval.GetRowMatchingId( ArticleId );
 			}
 
 			public override string ResourceName => Article.Title;
@@ -35,9 +35,8 @@ namespace EwlRealWorld.Website.Pages {
 							postBack: PostBack.CreateFull(
 								id: "delete",
 								firstModificationMethod: () => {
-									var mod = info.Article.ToModificationAsRevision();
-									mod.Deleted = true;
-									mod.Execute();
+									ArticleTagsModification.DeleteRows( new ArticleTagsTableEqualityConditions.ArticleId( info.ArticleId ) );
+									ArticlesModification.DeleteRows( new ArticlesTableEqualityConditions.ArticleId( info.ArticleId ) );
 								},
 								actionGetter: () => new PostBackAction( Home.GetInfo() ) ) ),
 						icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-trash" ) ) ) );
