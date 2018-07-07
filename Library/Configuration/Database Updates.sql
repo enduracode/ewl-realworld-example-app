@@ -53,8 +53,7 @@ create table ArticleRevisions(
 		not null
 		constraint ArticleRevisionsAuthorIdFk references Users,
 	Slug varchar( 100 )
-		not null
-		constraint ArticleRevisionsSlugUnique unique,
+		not null,
 	Title varchar( 100 )
 		not null,
 	[Description] varchar( 100 )
