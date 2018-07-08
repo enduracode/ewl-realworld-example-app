@@ -38,3 +38,24 @@ create table Articles(
 		not null
 )
 go
+
+create table Tags(
+	TagId int
+		not null
+		constraint TagsPk primary key,
+	TagName varchar( 25 )
+		not null
+		constraint TagsTagNameUnique unique
+)
+go
+
+create table ArticleTags(
+	ArticleId int
+		not null
+		constraint ArticleTagsArticleIdFk references Articles,
+	TagId int
+		not null
+		constraint ArticleTagsTagIdFk references Tags,
+	constraint ArticleTagsPk primary key( ArticleId, TagId )
+)
+go
