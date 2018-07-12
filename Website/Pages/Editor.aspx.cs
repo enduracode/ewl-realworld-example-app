@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Web.UI.WebControls;
 using EnterpriseWebLibrary;
@@ -137,9 +136,10 @@ namespace EwlRealWorld.Website.Pages {
 																	removeRs.ToCollection(),
 																	id: PostBack.GetCompositeId( "removeTag", tagId.ToString() ),
 																	firstModificationMethod: () => setTags( tagIds.Where( i => i != tagId ).ToArray() ) ) ) ).ToCollection()
-														.Concat( " {0}".FormatWith( TagsTableRetrieval.GetRowMatchingId( tagId ).TagName ).ToComponents() ),
+														.Concat( " {0}".FormatWith( TagsTableRetrieval.GetRowMatchingId( tagId ).TagName ).ToComponents() )
+														.Materialize(),
 													classes: ElementClasses.EditorTag ) )
-											.ToImmutableArray(),
+											.Materialize(),
 										updateRegionSets: rs.ToCollection().Append( removeRs ) ) )
 								.GetControls() ) ) );
 		}

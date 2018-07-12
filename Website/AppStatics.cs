@@ -22,7 +22,9 @@ namespace EwlRealWorld.Website {
 							new EwfHyperlink( Profile.GetInfo( article.AuthorId ), new StandardHyperlinkStyle( author.Username ) ).ToCollection<PhrasingComponent>()
 								.Append( new LineBreak() )
 								.Append(
-									new GenericPhrasingContainer( article.CreationDateAndTime.ToDayMonthYearString( false ).ToComponents(), classes: ElementClasses.Date ) ) ) ),
+									new GenericPhrasingContainer( article.CreationDateAndTime.ToDayMonthYearString( false ).ToComponents(), classes: ElementClasses.Date ) )
+								.Materialize() ) )
+					.Materialize(),
 				classes: ElementClasses.Author ).ToCollection();
 		}
 	}
