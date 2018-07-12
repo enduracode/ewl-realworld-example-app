@@ -56,8 +56,8 @@
     <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\DocumentFormat.OpenXml.2.5\lib\DocumentFormat.OpenXml.dll</HintPath>
     </Reference>
-    <Reference Include="EnterpriseWebLibrary, Version=251.0.832.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\EwlBill.251.0.0\lib\net462-full\EnterpriseWebLibrary.dll</HintPath>
+    <Reference Include="EnterpriseWebLibrary, Version=252.0.835.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\EwlBill.252.0.0\lib\net462-full\EnterpriseWebLibrary.dll</HintPath>
     </Reference>
     <Reference Include="Humanizer, Version=2.2.0.0, Culture=neutral, PublicKeyToken=979442b78dfc278e, processorArchitecture=MSIL">
       <HintPath>..\packages\Humanizer.Core.2.2.0\lib\netstandard1.0\Humanizer.dll</HintPath>
