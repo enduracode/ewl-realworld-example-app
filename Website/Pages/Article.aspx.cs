@@ -7,6 +7,7 @@ using EwlRealWorld.Library;
 using EwlRealWorld.Library.DataAccess.CommandConditions;
 using EwlRealWorld.Library.DataAccess.Modification;
 using EwlRealWorld.Library.DataAccess.TableRetrieval;
+using Humanizer;
 using Markdig;
 
 // Parameter: int articleId
@@ -41,6 +42,31 @@ namespace EwlRealWorld.Website.Pages {
 								},
 								actionGetter: () => new PostBackAction( Home.GetInfo() ) ) ),
 						icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-trash" ) ) ) );
+			else
+				EwfUiStatics.SetPageActions(
+					new ActionButtonSetup(
+						"{0} {1} ({2})".FormatWith(
+							AppTools.User == null || FollowsTableRetrieval.GetRowMatchingPk( AppTools.User.UserId, info.Article.AuthorId, returnNullIfNoMatch: true ) == null
+								? "Follow"
+								: "Unfollow",
+							UsersTableRetrieval.GetRowMatchingId( info.Article.AuthorId ).Username,
+							FollowsTableRetrieval.GetRows( new FollowsTableEqualityConditions.FolloweeId( info.Article.AuthorId ) ).Count() ),
+						AppTools.User == null
+							? (ActionControl)new EwfLink( Pages.User.GetInfo() )
+							:
+							FollowsTableRetrieval.GetRowMatchingPk( AppTools.User.UserId, info.Article.AuthorId, returnNullIfNoMatch: true ) == null
+								?
+								new PostBackButton(
+									postBack: PostBack.CreateFull(
+										id: "follow",
+										firstModificationMethod: () => FollowsModification.InsertRow( AppTools.User.UserId, info.Article.AuthorId ) ) )
+								: new PostBackButton(
+									postBack: PostBack.CreateFull(
+										id: "unfollow",
+										firstModificationMethod: () => FollowsModification.DeleteRows(
+											new FollowsTableEqualityConditions.FollowerId( AppTools.User.UserId ),
+											new FollowsTableEqualityConditions.FolloweeId( info.Article.AuthorId ) ) ) ),
+						icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-plus" ) ) ) );
 
 			ph.AddControlsReturnThis(
 				AppStatics.GetAuthorDisplay( info.Article )

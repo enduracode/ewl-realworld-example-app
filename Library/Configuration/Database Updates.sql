@@ -59,3 +59,14 @@ create table ArticleTags(
 	constraint ArticleTagsPk primary key( ArticleId, TagId )
 )
 go
+
+create table Follows(
+	FollowerId int
+		not null
+		constraint FollowsFollowerIdFk references Users,
+	FolloweeId int
+		not null
+		constraint FollowsFolloweeIdFk references Users,
+	constraint FollowsPk primary key( FollowerId, FolloweeId )
+)
+go
