@@ -43,7 +43,7 @@ namespace EwlRealWorld.Website.Pages {
 								actionGetter: () => new PostBackAction( Home.GetInfo() ) ) ),
 						icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-trash" ) ) ) );
 			else
-				EwfUiStatics.SetPageActions( getFollowAction() );
+				EwfUiStatics.SetPageActions( getFollowAction(), getFavoriteAction() );
 
 			ph.AddControlsReturnThis(
 				AppStatics.GetAuthorDisplay( info.Article )
@@ -82,6 +82,33 @@ namespace EwlRealWorld.Website.Pages {
 					FollowsTableRetrieval.GetRows( new FollowsTableEqualityConditions.FolloweeId( info.Article.AuthorId ) ).Count() ),
 				actionControl,
 				icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-plus" ) ) );
+		}
+
+		private ActionButtonSetup getFavoriteAction() {
+			ActionControl actionControl;
+			if( AppTools.User == null )
+				actionControl = new EwfLink( Pages.User.GetInfo() );
+			else if( FavoritesTableRetrieval.GetRowMatchingPk( AppTools.User.UserId, info.ArticleId, returnNullIfNoMatch: true ) == null )
+				actionControl = new PostBackButton(
+					postBack: PostBack.CreateFull(
+						id: "favorite",
+						firstModificationMethod: () => FavoritesModification.InsertRow( AppTools.User.UserId, info.ArticleId ) ) );
+			else
+				actionControl = new PostBackButton(
+					postBack: PostBack.CreateFull(
+						id: "unfavorite",
+						firstModificationMethod: () => FavoritesModification.DeleteRows(
+							new FavoritesTableEqualityConditions.UserId( AppTools.User.UserId ),
+							new FavoritesTableEqualityConditions.ArticleId( info.ArticleId ) ) ) );
+
+			return new ActionButtonSetup(
+				"{0} Article ({1})".FormatWith(
+					AppTools.User == null || FavoritesTableRetrieval.GetRowMatchingPk( AppTools.User.UserId, info.ArticleId, returnNullIfNoMatch: true ) == null
+						? "Favorite"
+						: "Unfavorite",
+					FavoritesTableRetrieval.GetRows( new FavoritesTableEqualityConditions.ArticleId( info.ArticleId ) ).Count() ),
+				actionControl,
+				icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-heart" ) ) );
 		}
 	}
 }

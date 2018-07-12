@@ -70,3 +70,14 @@ create table Follows(
 	constraint FollowsPk primary key( FollowerId, FolloweeId )
 )
 go
+
+create table Favorites(
+	UserId int
+		not null
+		constraint FavoritesUserIdFk references Users,
+	ArticleId int
+		not null
+		constraint FavoritesArticleIdFk references Articles,
+	constraint FavoritesPk primary key( UserId, ArticleId )
+)
+go
