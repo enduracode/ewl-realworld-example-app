@@ -12,12 +12,20 @@ div.author .date {
 	font-size: .8em;
 }
 
-span.editorTag {
+ewfUnorderedLineList.tag > ewfComponentListItem, span.editorTag {
 	font-size: .8em;
 	margin-right: .25em;
 	border-radius: .5em;
-	background-color: #818a91;
 	padding: .25em .5em;
+}
+
+ewfUnorderedLineList.tag > ewfComponentListItem {
+	border: 1px solid #ddd;
+	color: #aaa;
+}
+
+span.editorTag {
+	background-color: #818a91;
 	color: white;
 }
 span.editorTag ewfActionControlAllStylesAllStates {

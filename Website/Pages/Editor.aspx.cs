@@ -41,9 +41,7 @@ namespace EwlRealWorld.Website.Pages {
 			}
 
 			var tagIds = getTags(
-				info.ArticleId.HasValue
-					? ArticleTagsTableRetrieval.GetRows( new ArticleTagsTableEqualityConditions.ArticleId( info.ArticleId.Value ) ).Select( i => i.TagId )
-					: Enumerable.Empty<int>() );
+				info.ArticleId.HasValue ? ArticleTagsTableRetrieval.GetRowsLinkedToArticle( info.ArticleId.Value ).Select( i => i.TagId ) : Enumerable.Empty<int>() );
 
 			FormState.ExecuteWithDataModificationsAndDefaultAction(
 				PostBack.CreateFull(

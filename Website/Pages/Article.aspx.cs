@@ -1,8 +1,9 @@
-using System;
+using System.Linq;
 using EnterpriseWebLibrary;
 using EnterpriseWebLibrary.EnterpriseWebFramework;
 using EnterpriseWebLibrary.EnterpriseWebFramework.Controls;
 using EnterpriseWebLibrary.EnterpriseWebFramework.Ui;
+using EwlRealWorld.Library;
 using EwlRealWorld.Library.DataAccess.CommandConditions;
 using EwlRealWorld.Library.DataAccess.Modification;
 using EwlRealWorld.Library.DataAccess.TableRetrieval;
@@ -42,7 +43,14 @@ namespace EwlRealWorld.Website.Pages {
 						icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-trash" ) ) ) );
 
 			ph.AddControlsReturnThis(
-				AppStatics.GetAuthorDisplay( info.Article ).Append( new HtmlBlockContainer( Markdown.ToHtml( info.Article.BodyMarkdown ) ) ).GetControls() );
+				AppStatics.GetAuthorDisplay( info.Article )
+					.Append( new HtmlBlockContainer( Markdown.ToHtml( info.Article.BodyMarkdown ) ) )
+					.Append(
+						new LineList(
+							ArticleTagsTableRetrieval.GetRowsLinkedToArticle( info.ArticleId )
+								.Select( i => (LineListItem)TagsTableRetrieval.GetRowMatchingId( i.TagId ).TagName.ToComponents().ToComponentListItem() ),
+							generalSetup: new ComponentListSetup( classes: ElementClasses.Tag ) ) )
+					.GetControls() );
 		}
 	}
 }
