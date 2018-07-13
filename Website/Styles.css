@@ -1,4 +1,21 @@
-﻿div.author {
+﻿div.banner {
+	background-color: #5CB85C;
+	padding: 2em;
+	text-align: center;
+	color: white;
+}
+div.banner > div {
+	font-size: 3.5em;
+	font-weight: bold;
+	text-transform: lowercase;
+}
+div.banner > p {
+	font-size: 1.5em;
+	margin-top: 0;
+	font-weight: lighter;
+}
+
+div.author {
 	display: flex;
 	align-items: center;
 }
