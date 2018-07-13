@@ -26,5 +26,7 @@ namespace EwlRealWorld.Website {
 		protected override List<ResourceInfo> GetStyleSheets() {
 			return new StylesCss.Info().ToCollection<ResourceInfo>().ToList();
 		}
+
+		public override string AppDisplayName => "Conduit";
 	}
 }
