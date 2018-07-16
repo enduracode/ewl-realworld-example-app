@@ -15,6 +15,24 @@ div.banner > p {
 	font-weight: lighter;
 }
 
+div.homeContainer {
+	display: flex;
+}
+div.homeContainer > *:nth-child( 1 ) {
+	flex: 9 1 0;
+	margin-right: .5em;
+}
+div.homeContainer > *:nth-child( 2 ) {
+	flex: 3 1 0;
+	margin-left: .5em;
+}
+
+div.articleListAuthorAndFavorite, div.articleListDetail {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
 div.author {
 	display: flex;
 	align-items: center;
@@ -27,6 +45,13 @@ div.author ewfImage {
 }
 div.author .date {
 	font-size: .8em;
+}
+
+div.articleListDetail {
+	margin-top: 1em;
+}
+div.articleListDetail > ewfUnorderedLineList.tag {
+	margin: 0;
 }
 
 ewfUnorderedLineList.tag > ewfComponentListItem, span.editorTag {

@@ -157,6 +157,7 @@
     <Compile Include="Configuration\Providers\General.cs" />
     <Compile Include="Configuration\Providers\UserManagement.cs" />
     <Compile Include="DataAccess\MainSequence.cs" />
+    <Compile Include="DataAccess\Retrieval\ArticlesRetrieval.cs" />
     <Compile Include="DataAccess\TableRetrieval\ArticleTagsTableRetrieval.cs" />
     <Compile Include="Generated Code\ISU.cs" />
     <Compile Include="GlobalInitializer.cs" />

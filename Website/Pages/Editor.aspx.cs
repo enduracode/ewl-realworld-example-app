@@ -10,6 +10,7 @@ using EwlRealWorld.Library;
 using EwlRealWorld.Library.DataAccess;
 using EwlRealWorld.Library.DataAccess.CommandConditions;
 using EwlRealWorld.Library.DataAccess.Modification;
+using EwlRealWorld.Library.DataAccess.Retrieval;
 using EwlRealWorld.Library.DataAccess.TableConstants;
 using EwlRealWorld.Library.DataAccess.TableRetrieval;
 using Humanizer;
@@ -21,11 +22,11 @@ using Humanizer;
 namespace EwlRealWorld.Website.Pages {
 	partial class Editor: EwfPage {
 		partial class Info {
-			internal ArticlesTableRetrieval.Row Article { get; private set; }
+			internal ArticlesRetrieval.Row Article { get; private set; }
 
 			protected override void init() {
 				if( ArticleId.HasValue )
-					Article = ArticlesTableRetrieval.GetRowMatchingId( ArticleId.Value );
+					Article = ArticlesRetrieval.GetRowMatchingId( ArticleId.Value );
 			}
 
 			protected override bool userCanAccessResource => AppTools.User != null && ( !ArticleId.HasValue || Article.AuthorId == AppTools.User.UserId );
@@ -79,7 +80,7 @@ namespace EwlRealWorld.Website.Pages {
 		}
 
 		private string getSuffixedSlug( string slug ) {
-			var otherArticles = ArticlesTableRetrieval.GetRows();
+			var otherArticles = ArticlesRetrieval.GetRowsOrderedByCreation();
 			for( var suffix = 1;; suffix += 1 ) {
 				var suffixedSlug = slug + ( suffix == 1 ? "" : "-{0}".FormatWith( suffix.ToString() ) );
 				if( otherArticles.All( i => i.Slug != suffixedSlug ) )

@@ -3,9 +3,9 @@ using EnterpriseWebLibrary;
 using EnterpriseWebLibrary.EnterpriseWebFramework;
 using EnterpriseWebLibrary.EnterpriseWebFramework.Controls;
 using EnterpriseWebLibrary.EnterpriseWebFramework.Ui;
-using EwlRealWorld.Library;
 using EwlRealWorld.Library.DataAccess.CommandConditions;
 using EwlRealWorld.Library.DataAccess.Modification;
+using EwlRealWorld.Library.DataAccess.Retrieval;
 using EwlRealWorld.Library.DataAccess.TableRetrieval;
 using Humanizer;
 using Markdig;
@@ -15,10 +15,10 @@ using Markdig;
 namespace EwlRealWorld.Website.Pages {
 	partial class Article: EwfPage {
 		partial class Info {
-			internal ArticlesTableRetrieval.Row Article { get; private set; }
+			internal ArticlesRetrieval.Row Article { get; private set; }
 
 			protected override void init() {
-				Article = ArticlesTableRetrieval.GetRowMatchingId( ArticleId );
+				Article = ArticlesRetrieval.GetRowMatchingId( ArticleId );
 			}
 
 			public override string ResourceName => Article.Title;
@@ -46,13 +46,9 @@ namespace EwlRealWorld.Website.Pages {
 				EwfUiStatics.SetPageActions( getFollowAction(), getFavoriteAction() );
 
 			ph.AddControlsReturnThis(
-				AppStatics.GetAuthorDisplay( info.Article )
+				AppStatics.GetAuthorDisplay( info.Article, UsersTableRetrieval.GetRowMatchingId( info.Article.AuthorId ) )
 					.Append( new HtmlBlockContainer( Markdown.ToHtml( info.Article.BodyMarkdown ) ) )
-					.Append(
-						new LineList(
-							ArticleTagsTableRetrieval.GetRowsLinkedToArticle( info.ArticleId )
-								.Select( i => (LineListItem)TagsTableRetrieval.GetRowMatchingId( i.TagId ).TagName.ToComponents().ToComponentListItem() ),
-							generalSetup: new ComponentListSetup( classes: ElementClasses.Tag ) ) )
+					.Concat( AppStatics.GetTagDisplay( info.ArticleId, ArticleTagsTableRetrieval.GetRowsLinkedToArticle( info.ArticleId ) ) )
 					.GetControls() );
 		}
 

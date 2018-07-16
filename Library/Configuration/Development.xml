@@ -9,5 +9,28 @@
 		</project>
 	</webProjects>
 	<database>
+		<queries>
+			<query name="Articles">
+				<selectFromClause>SELECT a.* FROM Articles a</selectFromClause>
+				<postSelectFromClauses>
+					<postSelectFromClause name="MatchingId">
+						WHERE a.ArticleId = @articleId
+					</postSelectFromClause>
+					<postSelectFromClause name="OrderedByCreation">
+						ORDER BY a.CreationDateAndTime DESC
+					</postSelectFromClause>
+					<postSelectFromClause name="LinkedToTag">
+						JOIN ArticleTags t ON t.ArticleId = a.ArticleId
+						WHERE t.TagId = @tagId
+						ORDER BY a.CreationDateAndTime DESC
+					</postSelectFromClause>
+					<postSelectFromClause name="LinkedToFollower">
+						JOIN Follows f ON f.FolloweeId = a.AuthorId
+						WHERE f.FollowerId = @followerId
+						ORDER BY a.CreationDateAndTime DESC
+					</postSelectFromClause>
+				</postSelectFromClauses>
+			</query>
+		</queries>
 	</database>
 </systemDevelopmentConfiguration>
