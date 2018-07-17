@@ -24,7 +24,7 @@ namespace EwlRealWorld.Website {
 			TagsTableRetrieval.GetRows(); // prime cache for GetTagDisplay
 			components.Add(
 				new GenericFlowContainer(
-					new GenericPhrasingContainer( "Read more...".ToComponents() ).ToCollection()
+					new EwfHyperlink( Article.GetInfo( article.ArticleId ), new StandardHyperlinkStyle( "Read more..." ) ).ToCollection()
 						.Concat( GetTagDisplay( article.ArticleId, tagsByArticleId[ article.ArticleId ] ) )
 						.Materialize(),
 					classes: ElementClasses.ArticleListDetail ) );

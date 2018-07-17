@@ -73,11 +73,7 @@ namespace EwlRealWorld.Website.Pages {
 			var favoritesByArticleId = FavoritesTableRetrieval.GetRows().ToLookup( i => i.ArticleId );
 
 			var table = EwfTable.Create( defaultItemLimit: DataRowLimit.Fifty );
-			table.AddData(
-				results,
-				i => new EwfTableItem(
-					new EwfTableItemSetup( clickScript: ClickScript.CreateRedirectScript( Article.GetInfo( i.ArticleId ) ) ),
-					AppStatics.GetArticleDisplay( i, usersById, tagsByArticleId, favoritesByArticleId ).ToCell() ) );
+			table.AddData( results, i => new EwfTableItem( AppStatics.GetArticleDisplay( i, usersById, tagsByArticleId, favoritesByArticleId ).ToCell() ) );
 			controls.Add( new NamingPlaceholder( table.ToCollection(), updateRegionSets: articleRs.ToCollection() ) );
 
 			return new LegacySection( controls );
