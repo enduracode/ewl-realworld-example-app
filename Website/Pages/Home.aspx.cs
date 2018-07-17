@@ -90,15 +90,17 @@ namespace EwlRealWorld.Website.Pages {
 
 			return new Section(
 				"Popular Tags",
-				tags.Select(
-						i => new EwfButton(
-							new StandardButtonStyle( i.TagName, buttonSize: ButtonSize.ShrinkWrap ),
-							behavior: new PostBackBehavior(
-								postBack: PostBack.CreateIntermediate(
-									articleRs.ToCollection(),
-									id: PostBack.GetCompositeId( "tag", i.TagId.ToString() ),
-									firstModificationMethod: () => setFilter( "tag{0}".FormatWith( i.TagId ) ) ) ) ) )
-					.Materialize(),
+				new WrappingList(
+					tags.Select(
+						i => (WrappingListItem)new EwfButton(
+								new StandardButtonStyle( i.TagName, buttonSize: ButtonSize.ShrinkWrap ),
+								behavior: new PostBackBehavior(
+									postBack: PostBack.CreateIntermediate(
+										articleRs.ToCollection(),
+										id: PostBack.GetCompositeId( "tag", i.TagId.ToString() ),
+										firstModificationMethod: () => setFilter( "tag{0}".FormatWith( i.TagId ) ) ) ) ).ToCollection()
+							.ToComponentListItem() ),
+					generalSetup: new ComponentListSetup( classes: ElementClasses.Tag ) ).ToCollection(),
 				style: SectionStyle.Box );
 		}
 	}
