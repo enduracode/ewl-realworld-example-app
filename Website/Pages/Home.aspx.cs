@@ -80,7 +80,6 @@ namespace EwlRealWorld.Website.Pages {
 		}
 
 		private FlowComponent getTagSection( UpdateRegionSet articleRs ) {
-			TagsTableRetrieval.GetRows(); // prime cache for next line
 			var tags = ArticleTagsTableRetrieval.GetRows()
 				.Select( i => i.TagId )
 				.GroupBy( i => i )

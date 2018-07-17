@@ -9,6 +9,9 @@
 		</project>
 	</webProjects>
 	<database>
+		<SmallTables>
+			<Table>Tags</Table>
+		</SmallTables>
 		<queries>
 			<query name="Articles">
 				<selectFromClause>SELECT a.* FROM Articles a</selectFromClause>

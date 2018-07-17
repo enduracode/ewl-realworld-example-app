@@ -101,9 +101,7 @@ namespace EwlRealWorld.Website.Pages {
 											rs.ToCollection(),
 											id: "addTag",
 											firstModificationMethod: () => {
-												var tagId = TagsTableRetrieval.GetRows( new TagsTableEqualityConditions.TagName( tagName.Value ) )
-													.Select( i => (int?)i.TagId )
-													.SingleOrDefault();
+												var tagId = TagsTableRetrieval.GetAllRows().MatchingName( tagName.Value )?.TagId;
 												if( !tagId.HasValue ) {
 													tagId = MainSequence.GetNextValue();
 													TagsModification.InsertRow( tagId.Value, tagName.Value );

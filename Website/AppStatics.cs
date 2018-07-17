@@ -15,13 +15,14 @@ namespace EwlRealWorld.Website {
 			ArticlesRetrieval.Row article, Dictionary<int, UsersTableRetrieval.Row> usersById, ILookup<int, ArticleTagsTableRetrieval.Row> tagsByArticleId,
 			ILookup<int, FavoritesTableRetrieval.Row> favoritesByArticleId ) {
 			var components = new List<FlowComponent>();
+
 			components.Add(
 				new GenericFlowContainer(
 					GetAuthorDisplay( article, usersById[ article.AuthorId ] ).Append( getFavoriteActionComponent( article, favoritesByArticleId ) ).Materialize(),
 					classes: ElementClasses.ArticleListAuthorAndFavorite ) );
+
 			components.Add( new Section( article.Title, new Paragraph( article.Description.ToComponents() ).ToCollection() ) );
 
-			TagsTableRetrieval.GetRows(); // prime cache for GetTagDisplay
 			components.Add(
 				new GenericFlowContainer(
 					new EwfHyperlink( Article.GetInfo( article.ArticleId ), new StandardHyperlinkStyle( "Read more..." ) ).ToCollection()
