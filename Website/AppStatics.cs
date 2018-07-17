@@ -65,7 +65,7 @@ namespace EwlRealWorld.Website {
 					behavior: new PostBackBehavior(
 						postBack: PostBack.CreateIntermediate(
 							rs.ToCollection(),
-							id: "favorite",
+							id: PostBack.GetCompositeId( "favorite", article.ArticleId.ToString() ),
 							firstModificationMethod: () => FavoritesModification.InsertRow( AppTools.User.UserId, article.ArticleId ) ) ) );
 			else
 				button = new EwfButton(
@@ -73,7 +73,7 @@ namespace EwlRealWorld.Website {
 					behavior: new PostBackBehavior(
 						postBack: PostBack.CreateIntermediate(
 							rs.ToCollection(),
-							id: "unfavorite",
+							id: PostBack.GetCompositeId( "unfavorite", article.ArticleId.ToString() ),
 							firstModificationMethod: () => FavoritesModification.DeleteRows(
 								new FavoritesTableEqualityConditions.UserId( AppTools.User.UserId ),
 								new FavoritesTableEqualityConditions.ArticleId( article.ArticleId ) ) ) ) );
