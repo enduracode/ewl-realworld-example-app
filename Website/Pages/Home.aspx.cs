@@ -70,7 +70,7 @@ namespace EwlRealWorld.Website.Pages {
 			              ArticlesRetrieval.GetRowsOrderedByCreation();
 			var usersById = UsersTableRetrieval.GetRows().ToIdDictionary();
 			var tagsByArticleId = ArticleTagsTableRetrieval.GetRows().ToArticleIdLookup();
-			var favoritesByArticleId = FavoritesTableRetrieval.GetRows().ToLookup( i => i.ArticleId );
+			var favoritesByArticleId = FavoritesTableRetrieval.GetRows().ToArticleIdLookup();
 
 			var table = EwfTable.Create( defaultItemLimit: DataRowLimit.Fifty );
 			table.AddData( results, i => new EwfTableItem( AppStatics.GetArticleDisplay( i, usersById, tagsByArticleId, favoritesByArticleId ).ToCell() ) );

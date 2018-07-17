@@ -2,12 +2,14 @@
 using System.Linq;
 using EnterpriseWebLibrary;
 using EnterpriseWebLibrary.EnterpriseWebFramework;
+using EnterpriseWebLibrary.EnterpriseWebFramework.Controls;
 using EwlRealWorld.Library;
 using EwlRealWorld.Library.DataAccess.CommandConditions;
 using EwlRealWorld.Library.DataAccess.Modification;
 using EwlRealWorld.Library.DataAccess.Retrieval;
 using EwlRealWorld.Library.DataAccess.TableRetrieval;
 using EwlRealWorld.Website.Pages;
+using Humanizer;
 
 namespace EwlRealWorld.Website {
 	internal static class AppStatics {
@@ -85,5 +87,31 @@ namespace EwlRealWorld.Website {
 			new LineList(
 				tags.OrderByTagId().Select( i => (LineListItem)TagsTableRetrieval.GetRowMatchingId( i.TagId ).TagName.ToComponents().ToComponentListItem() ),
 				generalSetup: new ComponentListSetup( classes: ElementClasses.Tag ) ).ToCollection();
+
+		internal static ActionButtonSetup GetFollowAction( int userId ) {
+			ActionControl actionControl;
+			if( AppTools.User == null )
+				actionControl = new EwfLink( User.GetInfo() );
+			else if( FollowsTableRetrieval.GetRowMatchingPk( AppTools.User.UserId, userId, returnNullIfNoMatch: true ) == null )
+				actionControl = new PostBackButton(
+					postBack: PostBack.CreateFull( id: "follow", firstModificationMethod: () => FollowsModification.InsertRow( AppTools.User.UserId, userId ) ) );
+			else
+				actionControl = new PostBackButton(
+					postBack: PostBack.CreateFull(
+						id: "unfollow",
+						firstModificationMethod: () => FollowsModification.DeleteRows(
+							new FollowsTableEqualityConditions.FollowerId( AppTools.User.UserId ),
+							new FollowsTableEqualityConditions.FolloweeId( userId ) ) ) );
+
+			return new ActionButtonSetup(
+				"{0} {1} ({2})".FormatWith(
+					AppTools.User == null || FollowsTableRetrieval.GetRowMatchingPk( AppTools.User.UserId, userId, returnNullIfNoMatch: true ) == null
+						? "Follow"
+						: "Unfollow",
+					UsersTableRetrieval.GetRowMatchingId( userId ).Username,
+					FollowsTableRetrieval.GetRows( new FollowsTableEqualityConditions.FolloweeId( userId ) ).Count() ),
+				actionControl,
+				icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-plus" ) ) );
+		}
 	}
 }

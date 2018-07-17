@@ -43,41 +43,13 @@ namespace EwlRealWorld.Website.Pages {
 								actionGetter: () => new PostBackAction( Home.GetInfo() ) ) ),
 						icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-trash" ) ) ) );
 			else
-				EwfUiStatics.SetPageActions( getFollowAction(), getFavoriteAction() );
+				EwfUiStatics.SetPageActions( AppStatics.GetFollowAction( info.Article.AuthorId ), getFavoriteAction() );
 
 			ph.AddControlsReturnThis(
 				AppStatics.GetAuthorDisplay( info.Article, UsersTableRetrieval.GetRowMatchingId( info.Article.AuthorId ) )
 					.Append( new HtmlBlockContainer( Markdown.ToHtml( info.Article.BodyMarkdown ) ) )
 					.Concat( AppStatics.GetTagDisplay( info.ArticleId, ArticleTagsTableRetrieval.GetRowsLinkedToArticle( info.ArticleId ) ) )
 					.GetControls() );
-		}
-
-		private ActionButtonSetup getFollowAction() {
-			ActionControl actionControl;
-			if( AppTools.User == null )
-				actionControl = new EwfLink( Pages.User.GetInfo() );
-			else if( FollowsTableRetrieval.GetRowMatchingPk( AppTools.User.UserId, info.Article.AuthorId, returnNullIfNoMatch: true ) == null )
-				actionControl = new PostBackButton(
-					postBack: PostBack.CreateFull(
-						id: "follow",
-						firstModificationMethod: () => FollowsModification.InsertRow( AppTools.User.UserId, info.Article.AuthorId ) ) );
-			else
-				actionControl = new PostBackButton(
-					postBack: PostBack.CreateFull(
-						id: "unfollow",
-						firstModificationMethod: () => FollowsModification.DeleteRows(
-							new FollowsTableEqualityConditions.FollowerId( AppTools.User.UserId ),
-							new FollowsTableEqualityConditions.FolloweeId( info.Article.AuthorId ) ) ) );
-
-			return new ActionButtonSetup(
-				"{0} {1} ({2})".FormatWith(
-					AppTools.User == null || FollowsTableRetrieval.GetRowMatchingPk( AppTools.User.UserId, info.Article.AuthorId, returnNullIfNoMatch: true ) == null
-						? "Follow"
-						: "Unfollow",
-					UsersTableRetrieval.GetRowMatchingId( info.Article.AuthorId ).Username,
-					FollowsTableRetrieval.GetRows( new FollowsTableEqualityConditions.FolloweeId( info.Article.AuthorId ) ).Count() ),
-				actionControl,
-				icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-plus" ) ) );
 		}
 
 		private ActionButtonSetup getFavoriteAction() {

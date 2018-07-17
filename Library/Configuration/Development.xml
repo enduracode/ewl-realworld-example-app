@@ -22,6 +22,10 @@
 					<postSelectFromClause name="OrderedByCreation">
 						ORDER BY a.CreationDateAndTime DESC
 					</postSelectFromClause>
+					<postSelectFromClause name="LinkedToAuthor">
+						WHERE a.AuthorId = @authorId
+						ORDER BY a.CreationDateAndTime DESC
+					</postSelectFromClause>
 					<postSelectFromClause name="LinkedToTag">
 						JOIN ArticleTags t ON t.ArticleId = a.ArticleId
 						WHERE t.TagId = @tagId
@@ -30,6 +34,11 @@
 					<postSelectFromClause name="LinkedToFollower">
 						JOIN Follows f ON f.FolloweeId = a.AuthorId
 						WHERE f.FollowerId = @followerId
+						ORDER BY a.CreationDateAndTime DESC
+					</postSelectFromClause>
+					<postSelectFromClause name="LinkedToUser">
+						JOIN Favorites f ON f.ArticleId = a.ArticleId
+						WHERE f.UserId = @userId
 						ORDER BY a.CreationDateAndTime DESC
 					</postSelectFromClause>
 				</postSelectFromClauses>
