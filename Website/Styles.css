@@ -66,6 +66,32 @@ ewfUnorderedLineList.tag > ewfComponentListItem {
 	color: #aaa;
 }
 
+ewfUnorderedStackList.comment > ewfComponentListItem {
+	border: 1px solid #e5e5e5;
+}
+ewfUnorderedStackList.comment > ewfComponentListItem > * {
+	padding: 1em;
+}
+ewfUnorderedStackList.comment > ewfComponentListItem > div {
+	display: flex;
+	border-top: 1px solid #e5e5e5;
+	background-color: #f5f5f5;
+	justify-content: space-between;
+	align-items: center;
+}
+ewfUnorderedStackList.comment > ewfComponentListItem > div > div {
+	display: flex;
+	align-items: center;
+}
+ewfUnorderedStackList.comment > ewfComponentListItem > div > div > span:not( :first-child ) {
+	margin-left: .5em;
+}
+ewfUnorderedStackList.comment > ewfComponentListItem > div > div ewfImage {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: .75em;
+}
+
 span.editorTag {
 	background-color: #818a91;
 	color: white;

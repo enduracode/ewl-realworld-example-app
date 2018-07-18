@@ -81,3 +81,20 @@ create table Favorites(
 	constraint FavoritesPk primary key( UserId, ArticleId )
 )
 go
+
+create table Comments(
+	CommentId int
+		not null
+		constraint CommentsPk primary key,
+	AuthorId int
+		not null
+		constraint CommentsAuthorIdFk references Users,
+	ArticleId int
+		not null
+		constraint CommentsArticleIdFk references Articles,
+	BodyText varchar( max )
+		not null,
+	CreationDateAndTime datetime2
+		not null
+)
+go
