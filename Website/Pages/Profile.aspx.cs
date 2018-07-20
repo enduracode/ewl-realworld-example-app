@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.UI;
 using EnterpriseWebLibrary;
 using EnterpriseWebLibrary.EnterpriseWebFramework;
@@ -31,30 +32,37 @@ namespace EwlRealWorld.Website.Pages {
 			ph.AddControlsReturnThis( getArticleSection() );
 		}
 
-		private Control getArticleSection() {
-			var controls = new List<Control>();
+		private Control getArticleSection() =>
+			new LegacySection(
+				new LineList(
+						new[] { getAuthorTabComponents(), getFavoriteTabComponents() }.Select( i => (LineListItem)i.ToComponentListItem() ),
+						verticalAlignment: FlexboxVerticalAlignment.Center ).ToCollection()
+					.GetControls()
+					.Append( getResultTable() ) );
 
-			var navItems = new List<LineListItem>();
-			const string authorLabel = "My Articles";
-			navItems.Add(
-				( !info.ShowFavorites
-					  ? authorLabel.ToComponents()
-					  : new EwfButton(
-						  new StandardButtonStyle( authorLabel ),
-						  behavior: new PostBackBehavior(
-							  postBack: PostBack.CreateFull( id: "author", firstModificationMethod: () => parametersModification.ShowFavorites = false ) ) ).ToCollection() )
-				.ToComponentListItem() );
-			const string favoriteLabel = "Favorited Articles";
-			navItems.Add(
-				( info.ShowFavorites
-					  ? favoriteLabel.ToComponents()
-					  : new EwfButton(
-						  new StandardButtonStyle( favoriteLabel ),
-						  behavior: new PostBackBehavior(
-							  postBack: PostBack.CreateFull( id: "favorite", firstModificationMethod: () => parametersModification.ShowFavorites = true ) ) ).ToCollection() )
-				.ToComponentListItem() );
-			controls.AddRange( new LineList( navItems, verticalAlignment: FlexboxVerticalAlignment.Center ).ToCollection().GetControls() );
+		private IReadOnlyCollection<PhrasingComponent> getAuthorTabComponents() {
+			const string label = "My Articles";
+			return !info.ShowFavorites
+				       ? label.ToComponents()
+				       : new EwfButton(
+						       new StandardButtonStyle( label ),
+						       behavior: new PostBackBehavior(
+							       postBack: PostBack.CreateFull( id: "author", firstModificationMethod: () => parametersModification.ShowFavorites = false ) ) )
+					       .ToCollection();
+		}
 
+		private IReadOnlyCollection<PhrasingComponent> getFavoriteTabComponents() {
+			const string label = "Favorited Articles";
+			return info.ShowFavorites
+				       ? label.ToComponents()
+				       : new EwfButton(
+						       new StandardButtonStyle( label ),
+						       behavior: new PostBackBehavior(
+							       postBack: PostBack.CreateFull( id: "favorite", firstModificationMethod: () => parametersModification.ShowFavorites = true ) ) )
+					       .ToCollection();
+		}
+
+		private Control getResultTable() {
 			var results = info.ShowFavorites ? ArticlesRetrieval.GetRowsLinkedToUser( info.UserId ) : ArticlesRetrieval.GetRowsLinkedToAuthor( info.UserId );
 			var usersById = UsersTableRetrieval.GetRows().ToIdDictionary();
 			var tagsByArticleId = ArticleTagsTableRetrieval.GetRows().ToArticleIdLookup();
@@ -62,9 +70,7 @@ namespace EwlRealWorld.Website.Pages {
 
 			var table = EwfTable.Create( defaultItemLimit: DataRowLimit.Fifty );
 			table.AddData( results, i => new EwfTableItem( AppStatics.GetArticleDisplay( i, usersById, tagsByArticleId, favoritesByArticleId ).ToCell() ) );
-			controls.Add( table );
-
-			return new LegacySection( controls );
+			return table;
 		}
 	}
 }
