@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web.UI;
 using EnterpriseWebLibrary;
 using EnterpriseWebLibrary.Encryption;
 using EnterpriseWebLibrary.EnterpriseWebFramework;
@@ -45,42 +46,7 @@ namespace EwlRealWorld.Website.Pages {
 						actionGetter: () => new PostBackAction( logInHiddenFieldsAndMethod != null ? (PageInfo)Home.GetInfo() : Profile.GetInfo( AppTools.User.UserId ) ) )
 					.ToCollection(),
 				() => {
-					var table = FormItemBlock.CreateFormItemTable();
-
-					if( AppTools.User != null )
-						table.AddFormItems( mod.GetProfilePictureUrlUriFormItem( true, labelAndSubject: "URL of profile picture" ) );
-
-					table.AddFormItems( mod.GetUsernameTextControlFormItem( false, label: "Username".ToComponents(), value: AppTools.User == null ? "" : null ) );
-
-					if( AppTools.User != null )
-						table.AddFormItems(
-							mod.GetShortBioTextControlFormItem(
-								true,
-								label: "Short bio about you".ToComponents(),
-								controlSetup: TextControlSetup.Create( numberOfRows: 8 ) ) );
-
-					table.AddFormItems(
-						mod.GetEmailAddressEmailAddressControlFormItem( false, label: "Email".ToComponents(), value: AppTools.User == null ? "" : null ) );
-
-					if( AppTools.User == null )
-						table.AddFormItems( password.GetPasswordModificationFormItems().ToArray() );
-					else {
-						var changePasswordChecked = new DataValue<bool>();
-						table.AddFormItems(
-							FormItem.Create(
-								"",
-								changePasswordChecked.ToBlockCheckbox(
-									"Change password".ToComponents(),
-									setup: new BlockCheckBoxSetup(
-										nestedControlListGetter: () => FormState.ExecuteWithValidationPredicate(
-											() => changePasswordChecked.Value,
-											() => FormItemBlock.CreateFormItemList( numberOfColumns: 1, formItems: password.GetPasswordModificationFormItems() ).ToCollection() ) ),
-									value: false ),
-								validationGetter: control => control.Validation ) );
-					}
-
-					ph.AddControlsReturnThis( table );
-
+					ph.AddControlsReturnThis( getFormItemTable( mod, password ) );
 					EwfUiStatics.SetContentFootActions( new ActionButtonSetup( AppTools.User != null ? "Update Settings" : "Sign up", new PostBackButton() ) );
 
 					if( AppTools.User == null ) {
@@ -98,6 +64,36 @@ namespace EwlRealWorld.Website.Pages {
 			mod.ProfilePictureUrl = "";
 			mod.ShortBio = "";
 			return mod;
+		}
+
+		private Control getFormItemTable( UsersModification mod, DataValue<string> password ) {
+			var table = FormItemBlock.CreateFormItemTable();
+			if( AppTools.User != null )
+				table.AddFormItems( mod.GetProfilePictureUrlUriFormItem( true, labelAndSubject: "URL of profile picture" ) );
+			table.AddFormItems( mod.GetUsernameTextControlFormItem( false, label: "Username".ToComponents(), value: AppTools.User == null ? "" : null ) );
+			if( AppTools.User != null )
+				table.AddFormItems(
+					mod.GetShortBioTextControlFormItem( true, label: "Short bio about you".ToComponents(), controlSetup: TextControlSetup.Create( numberOfRows: 8 ) ) );
+			table.AddFormItems( mod.GetEmailAddressEmailAddressControlFormItem( false, label: "Email".ToComponents(), value: AppTools.User == null ? "" : null ) );
+
+			if( AppTools.User == null )
+				table.AddFormItems( password.GetPasswordModificationFormItems().ToArray() );
+			else {
+				var changePasswordChecked = new DataValue<bool>();
+				table.AddFormItems(
+					FormItem.Create(
+						"",
+						changePasswordChecked.ToBlockCheckbox(
+							"Change password".ToComponents(),
+							setup: new BlockCheckBoxSetup(
+								nestedControlListGetter: () => FormState.ExecuteWithValidationPredicate(
+									() => changePasswordChecked.Value,
+									() => FormItemBlock.CreateFormItemList( numberOfColumns: 1, formItems: password.GetPasswordModificationFormItems() ).ToCollection() ) ),
+							value: false ),
+						validationGetter: control => control.Validation ) );
+			}
+
+			return table;
 		}
 	}
 }
