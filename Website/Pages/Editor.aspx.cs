@@ -33,17 +33,9 @@ namespace EwlRealWorld.Website.Pages {
 		}
 
 		protected override void loadData() {
-			ArticlesModification mod;
-			if( info.ArticleId.HasValue )
-				mod = info.Article.ToModification();
-			else {
-				mod = ArticlesModification.CreateForInsert();
-				mod.AuthorId = AppTools.User.UserId;
-			}
-
+			var mod = getMod();
 			var tagIds = getTags(
 				info.ArticleId.HasValue ? ArticleTagsTableRetrieval.GetRowsLinkedToArticle( info.ArticleId.Value ).Select( i => i.TagId ) : Enumerable.Empty<int>() );
-
 			FormState.ExecuteWithDataModificationsAndDefaultAction(
 				PostBack.CreateFull(
 						firstModificationMethod: () => {
@@ -77,6 +69,15 @@ namespace EwlRealWorld.Website.Pages {
 					ph.AddControlsReturnThis( table );
 					EwfUiStatics.SetContentFootActions( new ActionButtonSetup( "Publish Article", new PostBackButton() ) );
 				} );
+		}
+
+		private ArticlesModification getMod() {
+			if( info.ArticleId.HasValue )
+				return info.Article.ToModification();
+
+			var mod = ArticlesModification.CreateForInsert();
+			mod.AuthorId = AppTools.User.UserId;
+			return mod;
 		}
 
 		private string getSuffixedSlug( string slug ) {

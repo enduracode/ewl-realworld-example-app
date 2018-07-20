@@ -25,15 +25,7 @@ namespace EwlRealWorld.Website.Pages {
 							new StandardHyperlinkStyle( "Have an account?" ) ).ToCollection()
 						.GetControls() );
 
-			UsersModification mod;
-			if( AppTools.User != null )
-				mod = UsersTableRetrieval.GetRowMatchingId( AppTools.User.UserId ).ToModification();
-			else {
-				mod = UsersModification.CreateForInsert();
-				mod.ProfilePictureUrl = "";
-				mod.ShortBio = "";
-			}
-
+			var mod = getMod();
 			var password = new DataValue<string> { Value = "" };
 			Tuple<IReadOnlyCollection<EtherealComponent>, Action<int>> logInHiddenFieldsAndMethod = null;
 			FormState.ExecuteWithDataModificationsAndDefaultAction(
@@ -96,6 +88,16 @@ namespace EwlRealWorld.Website.Pages {
 						logInHiddenFieldsAndMethod.Item1.AddEtherealControls( ph );
 					}
 				} );
+		}
+
+		private UsersModification getMod() {
+			if( AppTools.User != null )
+				return UsersTableRetrieval.GetRowMatchingId( AppTools.User.UserId ).ToModification();
+
+			var mod = UsersModification.CreateForInsert();
+			mod.ProfilePictureUrl = "";
+			mod.ShortBio = "";
+			return mod;
 		}
 	}
 }

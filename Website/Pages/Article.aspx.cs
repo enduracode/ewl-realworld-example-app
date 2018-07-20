@@ -92,10 +92,7 @@ namespace EwlRealWorld.Website.Pages {
 			CommentsModification commentMod = null;
 			var commentRs = new UpdateRegionSet();
 			if( AppTools.User != null ) {
-				commentMod = CommentsModification.CreateForInsert();
-				commentMod.AuthorId = AppTools.User.UserId;
-				commentMod.ArticleId = info.ArticleId;
-				commentMod.CreationDateAndTime = DateTime.UtcNow;
+				commentMod = getCommentMod();
 				FormState.ExecuteWithDataModificationsAndDefaultAction(
 					PostBack.CreateIntermediate(
 							commentRs.ToCollection(),
@@ -178,6 +175,14 @@ namespace EwlRealWorld.Website.Pages {
 					.GetControls() );
 
 			return controls;
+		}
+
+		private CommentsModification getCommentMod() {
+			var mod = CommentsModification.CreateForInsert();
+			mod.AuthorId = AppTools.User.UserId;
+			mod.ArticleId = info.ArticleId;
+			mod.CreationDateAndTime = DateTime.UtcNow;
+			return mod;
 		}
 	}
 }
