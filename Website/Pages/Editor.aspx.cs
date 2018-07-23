@@ -90,27 +90,15 @@ namespace EwlRealWorld.Website.Pages {
 		}
 
 		private FormItem getTagFormItem( IEnumerable<int> tagIds ) {
-			var rs = new UpdateRegionSet();
+			var addUpdateRegions = new UpdateRegionSet();
 			var tagName = new DataValue<string>();
-			var removeRs = new UpdateRegionSet();
+			var removeUpdateRegions = new UpdateRegionSet();
 			return FormItem.Create(
 				"Enter tags",
 				new PlaceHolder().AddControlsReturnThis(
 					new NamingPlaceholder(
 							FormState.ExecuteWithDataModificationsAndDefaultAction(
-									PostBack.CreateIntermediate(
-											rs.ToCollection(),
-											id: "addTag",
-											firstModificationMethod: () => {
-												var tagId = TagsTableRetrieval.GetAllRows().MatchingName( tagName.Value )?.TagId;
-												if( !tagId.HasValue ) {
-													tagId = MainSequence.GetNextValue();
-													TagsModification.InsertRow( tagId.Value, tagName.Value );
-												}
-
-												if( !tagIds.Contains( tagId.Value ) )
-													setTags( tagIds.Append( tagId.Value ).ToArray() );
-											} )
+									PostBack.CreateIntermediate( addUpdateRegions.ToCollection(), id: "addTag", firstModificationMethod: () => addTag( tagIds, tagName ) )
 										.ToCollection(),
 									() => new TextControl(
 										"",
@@ -120,26 +108,40 @@ namespace EwlRealWorld.Website.Pages {
 								.ToFormItem()
 								.ToControl()
 								.ToCollection(),
-							updateRegionSets: rs.ToCollection() ).ToCollection()
+							updateRegionSets: addUpdateRegions.ToCollection() ).ToCollection()
 						.Concat(
 							new LineBreak().ToCollection<PhrasingComponent>()
 								.Append(
 									new PhrasingIdContainer(
-										tagIds.Select(
-												tagId => new GenericPhrasingContainer(
-													new EwfButton(
-															new CustomButtonStyle( children: new FontAwesomeIcon( "fa-times" ).ToCollection() ),
-															behavior: new PostBackBehavior(
-																postBack: PostBack.CreateIntermediate(
-																	removeRs.ToCollection(),
-																	id: PostBack.GetCompositeId( "removeTag", tagId.ToString() ),
-																	firstModificationMethod: () => setTags( tagIds.Where( i => i != tagId ).ToArray() ) ) ) ).ToCollection()
-														.Concat( " {0}".FormatWith( TagsTableRetrieval.GetRowMatchingId( tagId ).TagName ).ToComponents() )
-														.Materialize(),
-													classes: ElementClasses.EditorTag ) )
-											.Materialize(),
-										updateRegionSets: rs.ToCollection().Append( removeRs ) ) )
+										getTagListComponents( tagIds, removeUpdateRegions ),
+										updateRegionSets: addUpdateRegions.ToCollection().Append( removeUpdateRegions ) ) )
 								.GetControls() ) ) );
 		}
+
+		private void addTag( IEnumerable<int> tagIds, DataValue<string> tagName ) {
+			var tagId = TagsTableRetrieval.GetAllRows().MatchingName( tagName.Value )?.TagId;
+			if( !tagId.HasValue ) {
+				tagId = MainSequence.GetNextValue();
+				TagsModification.InsertRow( tagId.Value, tagName.Value );
+			}
+
+			if( !tagIds.Contains( tagId.Value ) )
+				setTags( tagIds.Append( tagId.Value ).ToArray() );
+		}
+
+		private IReadOnlyCollection<PhrasingComponent> getTagListComponents( IEnumerable<int> tagIds, UpdateRegionSet removeUpdateRegions ) =>
+			tagIds.Select(
+					tagId => new GenericPhrasingContainer(
+						new EwfButton(
+								new CustomButtonStyle( children: new FontAwesomeIcon( "fa-times" ).ToCollection() ),
+								behavior: new PostBackBehavior(
+									postBack: PostBack.CreateIntermediate(
+										removeUpdateRegions.ToCollection(),
+										id: PostBack.GetCompositeId( "removeTag", tagId.ToString() ),
+										firstModificationMethod: () => setTags( tagIds.Where( i => i != tagId ).ToArray() ) ) ) ).ToCollection()
+							.Concat( " {0}".FormatWith( TagsTableRetrieval.GetRowMatchingId( tagId ).TagName ).ToComponents() )
+							.Materialize(),
+						classes: ElementClasses.EditorTag ) )
+				.Materialize();
 	}
 }
