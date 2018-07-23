@@ -23,48 +23,62 @@ namespace EwlRealWorld.Website.Pages {
 							classes: ElementClasses.Banner ).ToCollection()
 						.GetControls() );
 
-			var articleRs = new UpdateRegionSet();
+			var resultUpdateRegions = new UpdateRegionSet();
 			ph.AddControlsReturnThis(
-				new Block( getArticleSection( articleRs ).ToCollection().Concat( getTagSection( articleRs ).ToCollection().GetControls() ).ToArray() )
+				new Block(
+					getArticleSection( resultUpdateRegions ).ToCollection().Concat( getTagSection( resultUpdateRegions ).ToCollection().GetControls() ).ToArray() )
 					{
 						CssClass = CssClasses.HomeContainer
 					} );
 		}
 
-		private Control getArticleSection( UpdateRegionSet articleRs ) {
-			var controls = new List<Control>();
-
+		private Control getArticleSection( UpdateRegionSet resultUpdateRegions ) {
 			var filter = getFilter( AppTools.User != null ? "user" : "global" );
+			return new LegacySection(
+				new LineList(
+						new[] { getUserTabComponents( filter, resultUpdateRegions ), getGlobalTabComponents( filter, resultUpdateRegions ), getTagTabComponents( filter ) }
+							.Where( i => i.Any() )
+							.Select( i => (LineListItem)i.ToComponentListItem() ),
+						verticalAlignment: FlexboxVerticalAlignment.Center ).ToCollection()
+					.GetControls()
+					.Append( new NamingPlaceholder( getResultTable( filter ).ToCollection(), updateRegionSets: resultUpdateRegions.ToCollection() ) ) );
+		}
 
-			var navItems = new List<LineListItem>();
-			if( AppTools.User != null ) {
-				const string userLabel = "Your Feed";
-				navItems.Add(
-					( filter == "user"
-						  ? userLabel.ToComponents()
-						  : new EwfButton(
-								  new StandardButtonStyle( userLabel ),
-								  behavior: new PostBackBehavior(
-									  postBack: PostBack.CreateIntermediate( articleRs.ToCollection(), id: "user", firstModificationMethod: () => setFilter( "user" ) ) ) )
-							  .ToCollection() ).ToComponentListItem() );
-			}
-			const string globalLabel = "Global Feed";
-			navItems.Add(
-				( filter != "user" && !filter.StartsWith( "tag" )
-					  ? globalLabel.ToComponents()
-					  : new EwfButton(
-							  new StandardButtonStyle( globalLabel ),
-							  behavior: new PostBackBehavior(
-								  postBack: PostBack.CreateIntermediate( articleRs.ToCollection(), id: "global", firstModificationMethod: () => setFilter( "global" ) ) ) )
-						  .ToCollection() ).ToComponentListItem() );
-			if( filter.StartsWith( "tag" ) )
-				navItems.Add(
-					new FontAwesomeIcon( "fa-hashtag" ).ToCollection<PhrasingComponent>()
-						.Concat( " {0}".FormatWith( TagsTableRetrieval.GetRowMatchingId( int.Parse( filter.Substring( 3 ) ) ).TagName ).ToComponents() )
-						.Materialize()
-						.ToComponentListItem() );
-			controls.AddRange( new LineList( navItems, verticalAlignment: FlexboxVerticalAlignment.Center ).ToCollection().GetControls() );
+		private IReadOnlyCollection<PhrasingComponent> getUserTabComponents( string filter, UpdateRegionSet resultUpdateRegions ) {
+			const string label = "Your Feed";
+			return AppTools.User != null
+				       ? filter == "user" ? label.ToComponents() :
+				         new EwfButton(
+					         new StandardButtonStyle( label ),
+					         behavior: new PostBackBehavior(
+						         postBack: PostBack.CreateIntermediate(
+							         resultUpdateRegions.ToCollection(),
+							         id: "user",
+							         firstModificationMethod: () => setFilter( "user" ) ) ) ).ToCollection()
+				       : Enumerable.Empty<PhrasingComponent>().Materialize();
+		}
 
+		private IReadOnlyCollection<PhrasingComponent> getGlobalTabComponents( string filter, UpdateRegionSet resultUpdateRegions ) {
+			const string label = "Global Feed";
+			return filter != "user" && !filter.StartsWith( "tag" )
+				       ? label.ToComponents()
+				       : new EwfButton(
+					       new StandardButtonStyle( label ),
+					       behavior: new PostBackBehavior(
+						       postBack: PostBack.CreateIntermediate(
+							       resultUpdateRegions.ToCollection(),
+							       id: "global",
+							       firstModificationMethod: () => setFilter( "global" ) ) ) ).ToCollection();
+		}
+
+		private IReadOnlyCollection<PhrasingComponent> getTagTabComponents( string filter ) =>
+			filter.StartsWith( "tag" )
+				? new FontAwesomeIcon( "fa-hashtag" ).ToCollection<PhrasingComponent>()
+					.Concat( " {0}".FormatWith( TagsTableRetrieval.GetRowMatchingId( int.Parse( filter.Substring( 3 ) ) ).TagName ).ToComponents() )
+					.Materialize()
+				: Enumerable.Empty<PhrasingComponent>().Materialize();
+
+		private Control getResultTable( string filter ) {
 			var results = filter == "user" && AppTools.User != null ? ArticlesRetrieval.GetRowsLinkedToFollower( AppTools.User.UserId ) :
 			              filter.StartsWith( "tag" ) ? ArticlesRetrieval.GetRowsLinkedToTag( int.Parse( filter.Substring( 3 ) ) ) :
 			              ArticlesRetrieval.GetRowsOrderedByCreation();
@@ -74,12 +88,10 @@ namespace EwlRealWorld.Website.Pages {
 
 			var table = EwfTable.Create( defaultItemLimit: DataRowLimit.Fifty );
 			table.AddData( results, i => new EwfTableItem( AppStatics.GetArticleDisplay( i, usersById, tagsByArticleId, favoritesByArticleId ).ToCell() ) );
-			controls.Add( new NamingPlaceholder( table.ToCollection(), updateRegionSets: articleRs.ToCollection() ) );
-
-			return new LegacySection( controls );
+			return table;
 		}
 
-		private FlowComponent getTagSection( UpdateRegionSet articleRs ) {
+		private FlowComponent getTagSection( UpdateRegionSet resultUpdateRegions ) {
 			var tags = ArticleTagsTableRetrieval.GetRows()
 				.Select( i => i.TagId )
 				.GroupBy( i => i )
@@ -95,7 +107,7 @@ namespace EwlRealWorld.Website.Pages {
 								new StandardButtonStyle( i.TagName, buttonSize: ButtonSize.ShrinkWrap ),
 								behavior: new PostBackBehavior(
 									postBack: PostBack.CreateIntermediate(
-										articleRs.ToCollection(),
+										resultUpdateRegions.ToCollection(),
 										id: PostBack.GetCompositeId( "tag", i.TagId.ToString() ),
 										firstModificationMethod: () => setFilter( "tag{0}".FormatWith( i.TagId ) ) ) ) ).ToCollection()
 							.ToComponentListItem() ),
