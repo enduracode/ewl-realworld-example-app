@@ -4,7 +4,6 @@ using System.Linq;
 using System.Web.UI.WebControls;
 using EnterpriseWebLibrary;
 using EnterpriseWebLibrary.EnterpriseWebFramework;
-using EnterpriseWebLibrary.EnterpriseWebFramework.Controls;
 using EnterpriseWebLibrary.EnterpriseWebFramework.Ui;
 using EwlRealWorld.Library;
 using EwlRealWorld.Library.DataAccess;
@@ -67,7 +66,7 @@ namespace EwlRealWorld.Website.Pages {
 						getTagFormItem( tagIds ) );
 
 					ph.AddControlsReturnThis( table );
-					EwfUiStatics.SetContentFootActions( new ActionButtonSetup( "Publish Article", new PostBackButton() ) );
+					EwfUiStatics.SetContentFootActions( new ButtonSetup( "Publish Article" ).ToCollection() );
 				} );
 		}
 

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Web.UI;
 using EnterpriseWebLibrary;
 using EnterpriseWebLibrary.EnterpriseWebFramework;
-using EnterpriseWebLibrary.EnterpriseWebFramework.Controls;
 using EnterpriseWebLibrary.EnterpriseWebFramework.Ui;
 using EwlRealWorld.Library;
 using EwlRealWorld.Library.DataAccess;
@@ -34,23 +33,23 @@ namespace EwlRealWorld.Website.Pages {
 		protected override void loadData() {
 			if( AppTools.User != null && info.Article.AuthorId == AppTools.User.UserId )
 				EwfUiStatics.SetPageActions(
-					ActionButtonSetup.CreateWithUrl(
-						"Edit Article",
-						Editor.GetInfo( info.ArticleId ),
-						icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-pencil" ) ) ),
-					new ActionButtonSetup(
-						"Delete Article",
-						new PostBackButton(
-							postBack: PostBack.CreateFull(
-								id: "delete",
-								firstModificationMethod: () => {
-									ArticleTagsModification.DeleteRows( new ArticleTagsTableEqualityConditions.ArticleId( info.ArticleId ) );
-									ArticlesModification.DeleteRows( new ArticlesTableEqualityConditions.ArticleId( info.ArticleId ) );
-								},
-								actionGetter: () => new PostBackAction( Home.GetInfo() ) ) ),
-						icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-trash" ) ) ) );
+					new HyperlinkSetup( Editor.GetInfo( info.ArticleId ), "Edit Article", icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-pencil" ) ) )
+						.ToCollection<ActionComponentSetup>()
+						.Append(
+							new ButtonSetup(
+								"Delete Article",
+								behavior: new PostBackBehavior(
+									postBack: PostBack.CreateFull(
+										id: "delete",
+										firstModificationMethod: () => {
+											ArticleTagsModification.DeleteRows( new ArticleTagsTableEqualityConditions.ArticleId( info.ArticleId ) );
+											ArticlesModification.DeleteRows( new ArticlesTableEqualityConditions.ArticleId( info.ArticleId ) );
+										},
+										actionGetter: () => new PostBackAction( Home.GetInfo() ) ) ),
+								icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-trash" ) ) ) )
+						.Materialize() );
 			else
-				EwfUiStatics.SetPageActions( AppStatics.GetFollowAction( info.Article.AuthorId ), getFavoriteAction() );
+				EwfUiStatics.SetPageActions( AppStatics.GetFollowAction( info.Article.AuthorId ).ToCollection().Append( getFavoriteAction() ).Materialize() );
 
 			ph.AddControlsReturnThis(
 				AppStatics.GetAuthorDisplay( info.Article, UsersTableRetrieval.GetRowMatchingId( info.Article.AuthorId ) )
@@ -61,31 +60,29 @@ namespace EwlRealWorld.Website.Pages {
 			ph.AddControlsReturnThis( getCommentControls() );
 		}
 
-		private ActionButtonSetup getFavoriteAction() {
-			ActionControl actionControl;
-			if( AppTools.User == null )
-				actionControl = new EwfLink( Pages.User.GetInfo() );
-			else if( FavoritesTableRetrieval.GetRowMatchingPk( AppTools.User.UserId, info.ArticleId, returnNullIfNoMatch: true ) == null )
-				actionControl = new PostBackButton(
-					postBack: PostBack.CreateFull(
-						id: "favorite",
-						firstModificationMethod: () => FavoritesModification.InsertRow( AppTools.User.UserId, info.ArticleId ) ) );
-			else
-				actionControl = new PostBackButton(
-					postBack: PostBack.CreateFull(
-						id: "unfavorite",
-						firstModificationMethod: () => FavoritesModification.DeleteRows(
-							new FavoritesTableEqualityConditions.UserId( AppTools.User.UserId ),
-							new FavoritesTableEqualityConditions.ArticleId( info.ArticleId ) ) ) );
+		private ActionComponentSetup getFavoriteAction() {
+			var text = "{0} Article ({1})".FormatWith(
+				AppTools.User == null || FavoritesTableRetrieval.GetRowMatchingPk( AppTools.User.UserId, info.ArticleId, returnNullIfNoMatch: true ) == null
+					? "Favorite"
+					: "Unfavorite",
+				FavoritesTableRetrieval.GetRows( new FavoritesTableEqualityConditions.ArticleId( info.ArticleId ) ).Count() );
+			var icon = new ActionComponentIcon( new FontAwesomeIcon( "fa-heart" ) );
 
-			return new ActionButtonSetup(
-				"{0} Article ({1})".FormatWith(
-					AppTools.User == null || FavoritesTableRetrieval.GetRowMatchingPk( AppTools.User.UserId, info.ArticleId, returnNullIfNoMatch: true ) == null
-						? "Favorite"
-						: "Unfavorite",
-					FavoritesTableRetrieval.GetRows( new FavoritesTableEqualityConditions.ArticleId( info.ArticleId ) ).Count() ),
-				actionControl,
-				icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-heart" ) ) );
+			return AppTools.User == null
+				       ? (ActionComponentSetup)new HyperlinkSetup( Pages.User.GetInfo(), text, icon: icon )
+				       : new ButtonSetup(
+					       text,
+					       behavior: new PostBackBehavior(
+						       postBack: FavoritesTableRetrieval.GetRowMatchingPk( AppTools.User.UserId, info.ArticleId, returnNullIfNoMatch: true ) == null
+							                 ? PostBack.CreateFull(
+								                 id: "favorite",
+								                 firstModificationMethod: () => FavoritesModification.InsertRow( AppTools.User.UserId, info.ArticleId ) )
+							                 : PostBack.CreateFull(
+								                 id: "unfavorite",
+								                 firstModificationMethod: () => FavoritesModification.DeleteRows(
+									                 new FavoritesTableEqualityConditions.UserId( AppTools.User.UserId ),
+									                 new FavoritesTableEqualityConditions.ArticleId( info.ArticleId ) ) ) ),
+					       icon: icon );
 		}
 
 		private IReadOnlyCollection<Control> getCommentControls() {

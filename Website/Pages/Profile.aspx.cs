@@ -26,8 +26,8 @@ namespace EwlRealWorld.Website.Pages {
 		protected override void loadData() {
 			EwfUiStatics.SetPageActions(
 				AppTools.User != null && info.UserId == AppTools.User.UserId
-					? ActionButtonSetup.CreateWithUrl( "Edit Profile Settings", Pages.User.GetInfo(), icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-cog" ) ) )
-					: AppStatics.GetFollowAction( info.UserId ) );
+					? new HyperlinkSetup( Pages.User.GetInfo(), "Edit Profile Settings", icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-cog" ) ) ).ToCollection()
+					: AppStatics.GetFollowAction( info.UserId ).ToCollection() );
 
 			ph.AddControlsReturnThis( getArticleSection() );
 		}

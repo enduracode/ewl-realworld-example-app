@@ -5,7 +5,6 @@ using System.Web.UI;
 using EnterpriseWebLibrary;
 using EnterpriseWebLibrary.Encryption;
 using EnterpriseWebLibrary.EnterpriseWebFramework;
-using EnterpriseWebLibrary.EnterpriseWebFramework.Controls;
 using EnterpriseWebLibrary.EnterpriseWebFramework.Ui;
 using EnterpriseWebLibrary.EnterpriseWebFramework.UserManagement;
 using EwlRealWorld.Library.DataAccess;
@@ -47,7 +46,7 @@ namespace EwlRealWorld.Website.Pages {
 					.ToCollection(),
 				() => {
 					ph.AddControlsReturnThis( getFormItemTable( mod, password ) );
-					EwfUiStatics.SetContentFootActions( new ActionButtonSetup( AppTools.User != null ? "Update Settings" : "Sign up", new PostBackButton() ) );
+					EwfUiStatics.SetContentFootActions( new ButtonSetup( AppTools.User != null ? "Update Settings" : "Sign up" ).ToCollection() );
 
 					if( AppTools.User == null ) {
 						logInHiddenFieldsAndMethod = FormsAuthStatics.GetLogInHiddenFieldsAndSpecifiedUserLogInMethod();

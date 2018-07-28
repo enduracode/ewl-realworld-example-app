@@ -7,28 +7,25 @@ using EwlRealWorld.Website.Pages;
 
 namespace EwlRealWorld.Website.Providers {
 	internal class EwfUiProvider: AppEwfUiProvider {
-		public override List<ActionButtonSetup> GetGlobalNavActionControls() {
+		public override IReadOnlyCollection<ActionComponentSetup> GetGlobalNavActions() {
 			if( AppTools.User == null ) {
 				var signUpPage = User.GetInfo();
 				return new[]
 					{
-						ActionButtonSetup.CreateWithUrl( "Home", Home.GetInfo() ),
-						ActionButtonSetup.CreateWithUrl(
-							"Sign in",
-							EnterpriseWebLibrary.EnterpriseWebFramework.EwlRealWorld.Website.UserManagement.LogIn.GetInfo( Home.GetInfo().GetUrl() ) ),
-						ActionButtonSetup.CreateWithUrl( signUpPage.ResourceName, signUpPage )
+						new HyperlinkSetup( Home.GetInfo(), "Home" ),
+						new HyperlinkSetup(
+							EnterpriseWebLibrary.EnterpriseWebFramework.EwlRealWorld.Website.UserManagement.LogIn.GetInfo( Home.GetInfo().GetUrl() ),
+							"Sign in" ),
+						new HyperlinkSetup( signUpPage, signUpPage.ResourceName )
 					}.ToList();
 			}
 
 			return new[]
 				{
-					ActionButtonSetup.CreateWithUrl( "Home", Home.GetInfo() ),
-					ActionButtonSetup.CreateWithUrl(
-						"New Article",
-						Editor.GetInfo( null ),
-						icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-pencil-square-o" ) ) ),
-					ActionButtonSetup.CreateWithUrl( "Settings", User.GetInfo(), icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-cog" ) ) ),
-					ActionButtonSetup.CreateWithUrl( UsersTableRetrieval.GetRowMatchingId( AppTools.User.UserId ).Username, Profile.GetInfo( AppTools.User.UserId ) )
+					new HyperlinkSetup( Home.GetInfo(), "Home" ),
+					new HyperlinkSetup( Editor.GetInfo( null ), "New Article", icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-pencil-square-o" ) ) ),
+					new HyperlinkSetup( User.GetInfo(), "Settings", icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-cog" ) ) ),
+					new HyperlinkSetup( Profile.GetInfo( AppTools.User.UserId ), UsersTableRetrieval.GetRowMatchingId( AppTools.User.UserId ).Username )
 				}.ToList();
 		}
 	}

@@ -2,7 +2,6 @@
 using System.Linq;
 using EnterpriseWebLibrary;
 using EnterpriseWebLibrary.EnterpriseWebFramework;
-using EnterpriseWebLibrary.EnterpriseWebFramework.Controls;
 using EwlRealWorld.Library;
 using EwlRealWorld.Library.DataAccess.CommandConditions;
 using EwlRealWorld.Library.DataAccess.Modification;
@@ -88,30 +87,30 @@ namespace EwlRealWorld.Website {
 				tags.OrderByTagId().Select( i => (LineListItem)TagsTableRetrieval.GetRowMatchingId( i.TagId ).TagName.ToComponents().ToComponentListItem() ),
 				generalSetup: new ComponentListSetup( classes: ElementClasses.Tag ) ).ToCollection();
 
-		internal static ActionButtonSetup GetFollowAction( int userId ) {
-			ActionControl actionControl;
-			if( AppTools.User == null )
-				actionControl = new EwfLink( User.GetInfo() );
-			else if( FollowsTableRetrieval.GetRowMatchingPk( AppTools.User.UserId, userId, returnNullIfNoMatch: true ) == null )
-				actionControl = new PostBackButton(
-					postBack: PostBack.CreateFull( id: "follow", firstModificationMethod: () => FollowsModification.InsertRow( AppTools.User.UserId, userId ) ) );
-			else
-				actionControl = new PostBackButton(
-					postBack: PostBack.CreateFull(
-						id: "unfollow",
-						firstModificationMethod: () => FollowsModification.DeleteRows(
-							new FollowsTableEqualityConditions.FollowerId( AppTools.User.UserId ),
-							new FollowsTableEqualityConditions.FolloweeId( userId ) ) ) );
+		internal static ActionComponentSetup GetFollowAction( int userId ) {
+			var text = "{0} {1} ({2})".FormatWith(
+				AppTools.User == null || FollowsTableRetrieval.GetRowMatchingPk( AppTools.User.UserId, userId, returnNullIfNoMatch: true ) == null
+					? "Follow"
+					: "Unfollow",
+				UsersTableRetrieval.GetRowMatchingId( userId ).Username,
+				FollowsTableRetrieval.GetRows( new FollowsTableEqualityConditions.FolloweeId( userId ) ).Count() );
+			var icon = new ActionComponentIcon( new FontAwesomeIcon( "fa-plus" ) );
 
-			return new ActionButtonSetup(
-				"{0} {1} ({2})".FormatWith(
-					AppTools.User == null || FollowsTableRetrieval.GetRowMatchingPk( AppTools.User.UserId, userId, returnNullIfNoMatch: true ) == null
-						? "Follow"
-						: "Unfollow",
-					UsersTableRetrieval.GetRowMatchingId( userId ).Username,
-					FollowsTableRetrieval.GetRows( new FollowsTableEqualityConditions.FolloweeId( userId ) ).Count() ),
-				actionControl,
-				icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-plus" ) ) );
+			return AppTools.User == null
+				       ? (ActionComponentSetup)new HyperlinkSetup( User.GetInfo(), text, icon: icon )
+				       : new ButtonSetup(
+					       text,
+					       behavior: new PostBackBehavior(
+						       postBack: FollowsTableRetrieval.GetRowMatchingPk( AppTools.User.UserId, userId, returnNullIfNoMatch: true ) == null
+							                 ? PostBack.CreateFull(
+								                 id: "follow",
+								                 firstModificationMethod: () => FollowsModification.InsertRow( AppTools.User.UserId, userId ) )
+							                 : PostBack.CreateFull(
+								                 id: "unfollow",
+								                 firstModificationMethod: () => FollowsModification.DeleteRows(
+									                 new FollowsTableEqualityConditions.FollowerId( AppTools.User.UserId ),
+									                 new FollowsTableEqualityConditions.FolloweeId( userId ) ) ) ),
+					       icon: icon );
 		}
 	}
 }
