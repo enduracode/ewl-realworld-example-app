@@ -26,7 +26,7 @@ More information is available from our developers; please [ask for help in the f
 
 *	Windows 10, .NET Framework 4.6.2, IIS Express 10 (.NET Core support is on the roadmap!)
 *	Visual Studio 2017 (recommended)
-* SQL Server 2016 or later
+* SQL Server 2016 or later; if you don’t have this, Express edition is [free and available for download](https://www.microsoft.com/en-us/sql-server/sql-server-editions-express)
 
 
 ## Building and running the system
@@ -35,6 +35,14 @@ More information is available from our developers; please [ask for help in the f
 
 2.	Open the solution file in Visual Studio. Ignore the message that “one or more projects in the solution were not loaded correctly”; the next step will resolve this by generating the missing file.
 
-3.	In the Package Manager Console, click the `Restore` button. Then run `Update-Data` (to create the database) and `Update-DependentLogic` (to configure IIS Express and generate some code). Right-click the `Website` project and select `Reload Project`.
+3.	In the Package Manager Console, perform these steps:
 
-4.	Run the `Website` project. You should see the home page.
+	1. Click the `Restore` button.
+
+	2. **If you’re using SQL Server Express edition,** run `Initialize-InstallationConfiguration`. Then open `Library/Configuration/Installation/Installations/Development/Standard.xml` and change `<database xsi:type="SqlServerDatabase" />` to `<database xsi:type="SqlServerDatabase"><server>(local)\SQLExpress</server></database>`.
+
+	3. Run `Update-Data` (to create the database) and `Update-DependentLogic` (to configure IIS Express and generate some code).
+
+4.	Right-click the `Website` project and select `Reload Project`.
+
+5.	Run the `Website` project. You should see the home page.
