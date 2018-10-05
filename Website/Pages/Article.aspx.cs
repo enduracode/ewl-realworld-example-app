@@ -49,7 +49,24 @@ namespace EwlRealWorld.Website.Pages {
 								icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-trash" ) ) ) )
 						.Materialize() );
 			else
-				EwfUiStatics.SetPageActions( AppStatics.GetFollowAction( info.Article.AuthorId ).ToCollection().Append( getFavoriteAction() ).Materialize() );
+				EwfUiStatics.SetPageActions(
+					AppStatics.GetFollowAction( info.Article.AuthorId )
+						.ToCollection()
+						.Append( getFavoriteAction() )
+						.Concat(
+							!info.Article.IsSpam && AppTools.User != null
+								? new ButtonSetup(
+									"Flag as Spam",
+									behavior: new PostBackBehavior(
+										postBack: PostBack.CreateFull(
+											id: "spam",
+											firstModificationMethod: () => {
+												var mod = info.Article.ToModification();
+												mod.IsSpam = true;
+												mod.Execute();
+											} ) ) ).ToCollection()
+								: Enumerable.Empty<ActionComponentSetup>() )
+						.Materialize() );
 
 			ph.AddControlsReturnThis(
 				AppStatics.GetAuthorDisplay( info.Article, UsersTableRetrieval.GetRowMatchingId( info.Article.AuthorId ) )

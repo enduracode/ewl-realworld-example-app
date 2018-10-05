@@ -98,3 +98,12 @@ create table Comments(
 		not null
 )
 go
+
+alter table Articles add
+	IsSpam bit
+		null
+go
+update Articles set IsSpam = 0
+go
+alter table Articles alter column IsSpam bit not null
+go

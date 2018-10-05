@@ -76,6 +76,7 @@ namespace EwlRealWorld.Website.Pages {
 
 			var mod = ArticlesModification.CreateForInsert();
 			mod.AuthorId = AppTools.User.UserId;
+			mod.IsSpam = false;
 			return mod;
 		}
 
