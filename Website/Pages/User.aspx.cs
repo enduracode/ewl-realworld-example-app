@@ -68,7 +68,7 @@ namespace EwlRealWorld.Website.Pages {
 		private Control getFormItemTable( UsersModification mod, DataValue<string> password ) {
 			var table = FormItemBlock.CreateFormItemTable();
 			if( AppTools.User != null )
-				table.AddFormItems( mod.GetProfilePictureUrlUriFormItem( true, labelAndSubject: "URL of profile picture" ) );
+				table.AddFormItems( mod.GetProfilePictureUrlUrlControlFormItem( true, label: "URL of profile picture".ToComponents() ) );
 			table.AddFormItems( mod.GetUsernameTextControlFormItem( false, label: "Username".ToComponents(), value: AppTools.User == null ? "" : null ) );
 			if( AppTools.User != null )
 				table.AddFormItems(
