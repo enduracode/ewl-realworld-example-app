@@ -1,10 +1,8 @@
 # EWL-REGION
 syntax: glob
 
-.vs/EWL RealWorld/DesignTimeBuild/
-.vs/EWL RealWorld/v15/.suo
-.vs/EWL RealWorld/v15/sqlite3/
-.vs/EWL RealWorld/v15/Server/sqlite3/
+.vs/EWL RealWorld/v16/.suo
+.vs/EWL RealWorld/v16/Server/sqlite3/
 packages/
 EWL RealWorld.sln.DotSettings.user
 Error Log.txt
