@@ -89,7 +89,7 @@ namespace EwlRealWorld.Website.Pages {
 			var controls = new List<Control>();
 
 			var createUpdateRegions = new UpdateRegionSet();
-			controls.AddRange( getNewCommentControls( createUpdateRegions ) );
+			controls.AddRange( getNewCommentComponents( createUpdateRegions ).GetControls() );
 
 			var usersById = UsersTableRetrieval.GetRows().ToIdDictionary();
 			controls.AddRange(
@@ -116,18 +116,16 @@ namespace EwlRealWorld.Website.Pages {
 			return controls;
 		}
 
-		private IReadOnlyCollection<Control> getNewCommentControls( UpdateRegionSet createUpdateRegions ) {
+		private IReadOnlyCollection<FlowComponent> getNewCommentComponents( UpdateRegionSet createUpdateRegions ) {
 			if( AppTools.User == null )
 				return new Paragraph(
-						new EwfHyperlink(
-								EnterpriseWebLibrary.EnterpriseWebFramework.EwlRealWorld.Website.UserManagement.LogIn.GetInfo( Home.GetInfo().GetUrl() ),
-								new StandardHyperlinkStyle( "Sign in" ) ).ToCollection()
-							.Concat( " or ".ToComponents() )
-							.Append( new EwfHyperlink( Pages.User.GetInfo(), new StandardHyperlinkStyle( "sign up" ) ) )
-							.Concat( " to add comments on this article.".ToComponents() )
-							.Materialize() ).ToCollection()
-					.GetControls()
-					.Materialize();
+					new EwfHyperlink(
+							EnterpriseWebLibrary.EnterpriseWebFramework.EwlRealWorld.Website.UserManagement.LogIn.GetInfo( Home.GetInfo().GetUrl() ),
+							new StandardHyperlinkStyle( "Sign in" ) ).ToCollection()
+						.Concat( " or ".ToComponents() )
+						.Append( new EwfHyperlink( Pages.User.GetInfo(), new StandardHyperlinkStyle( "sign up" ) ) )
+						.Concat( " to add comments on this article.".ToComponents() )
+						.Materialize() ).ToCollection();
 
 			commentMod = getCommentMod();
 			return FormState.ExecuteWithDataModificationsAndDefaultAction(
@@ -139,15 +137,14 @@ namespace EwlRealWorld.Website.Pages {
 							commentMod.Execute();
 						} )
 					.ToCollection(),
-				() => new NamingPlaceholder(
+				() => new FlowIdContainer(
 					commentMod.GetBodyTextTextControlFormItem(
 							false,
 							label: Enumerable.Empty<PhrasingComponent>().Materialize(),
 							controlSetup: TextControlSetup.Create( numberOfRows: 3, placeholder: "Write a comment..." ),
 							value: "" )
-						.ToControl()
-						.ToCollection()
-						.Concat( new EwfButton( new StandardButtonStyle( "Post Comment" ) ).ToCollection().GetControls() ),
+						.ToComponentCollection()
+						.Append( new EwfButton( new StandardButtonStyle( "Post Comment" ) ) ),
 					updateRegionSets: createUpdateRegions.ToCollection() ).ToCollection() );
 		}
 

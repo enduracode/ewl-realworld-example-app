@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.UI;
 using EnterpriseWebLibrary;
 using EnterpriseWebLibrary.Encryption;
 using EnterpriseWebLibrary.EnterpriseWebFramework;
@@ -45,7 +44,7 @@ namespace EwlRealWorld.Website.Pages {
 						actionGetter: () => new PostBackAction( logInHiddenFieldsAndMethod != null ? (PageInfo)Home.GetInfo() : Profile.GetInfo( AppTools.User.UserId ) ) )
 					.ToCollection(),
 				() => {
-					ph.AddControlsReturnThis( getFormItemTable( mod, password ) );
+					ph.AddControlsReturnThis( getFormItemStack( mod, password ).ToCollection().GetControls() );
 					EwfUiStatics.SetContentFootActions( new ButtonSetup( AppTools.User != null ? "Update Settings" : "Sign up" ).ToCollection() );
 
 					if( AppTools.User == null ) {
@@ -65,34 +64,32 @@ namespace EwlRealWorld.Website.Pages {
 			return mod;
 		}
 
-		private Control getFormItemTable( UsersModification mod, DataValue<string> password ) {
-			var table = FormItemBlock.CreateFormItemTable();
+		private FlowComponent getFormItemStack( UsersModification mod, DataValue<string> password ) {
+			var stack = FormItemList.CreateStack();
 			if( AppTools.User != null )
-				table.AddFormItems( mod.GetProfilePictureUrlUrlControlFormItem( true, label: "URL of profile picture".ToComponents() ) );
-			table.AddFormItems( mod.GetUsernameTextControlFormItem( false, label: "Username".ToComponents(), value: AppTools.User == null ? "" : null ) );
+				stack.AddFormItems( mod.GetProfilePictureUrlUrlControlFormItem( true, label: "URL of profile picture".ToComponents() ) );
+			stack.AddFormItems( mod.GetUsernameTextControlFormItem( false, label: "Username".ToComponents(), value: AppTools.User == null ? "" : null ) );
 			if( AppTools.User != null )
-				table.AddFormItems(
+				stack.AddFormItems(
 					mod.GetShortBioTextControlFormItem( true, label: "Short bio about you".ToComponents(), controlSetup: TextControlSetup.Create( numberOfRows: 8 ) ) );
-			table.AddFormItems( mod.GetEmailAddressEmailAddressControlFormItem( false, label: "Email".ToComponents(), value: AppTools.User == null ? "" : null ) );
+			stack.AddFormItems( mod.GetEmailAddressEmailAddressControlFormItem( false, label: "Email".ToComponents(), value: AppTools.User == null ? "" : null ) );
 
 			if( AppTools.User == null )
-				table.AddFormItems( password.GetPasswordModificationFormItems().ToArray() );
+				stack.AddFormItems( password.GetPasswordModificationFormItems().ToArray() );
 			else {
 				var changePasswordChecked = new DataValue<bool>();
-				table.AddFormItems(
-					FormItem.Create(
-						"",
-						changePasswordChecked.ToBlockCheckbox(
+				stack.AddFormItems(
+					changePasswordChecked.ToFlowCheckbox(
 							"Change password".ToComponents(),
-							setup: new BlockCheckBoxSetup(
-								nestedControlListGetter: () => FormState.ExecuteWithValidationPredicate(
+							setup: FlowCheckboxSetup.Create(
+								nestedContentGetter: () => FormState.ExecuteWithValidationPredicate(
 									() => changePasswordChecked.Value,
-									() => FormItemBlock.CreateFormItemList( numberOfColumns: 1, formItems: password.GetPasswordModificationFormItems() ).ToCollection() ) ),
-							value: false ),
-						validationGetter: control => control.Validation ) );
+									() => FormItemList.CreateGrid( 1, items: password.GetPasswordModificationFormItems() ).ToCollection() ) ),
+							value: false )
+						.ToFormItem() );
 			}
 
-			return table;
+			return stack;
 		}
 	}
 }

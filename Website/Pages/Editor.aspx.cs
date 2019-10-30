@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.UI.WebControls;
 using EnterpriseWebLibrary;
 using EnterpriseWebLibrary.EnterpriseWebFramework;
 using EnterpriseWebLibrary.EnterpriseWebFramework.Ui;
@@ -53,9 +52,9 @@ namespace EwlRealWorld.Website.Pages {
 						actionGetter: () => new PostBackAction( Article.GetInfo( mod.ArticleId ) ) )
 					.ToCollection(),
 				() => {
-					var table = FormItemBlock.CreateFormItemTable();
+					var stack = FormItemList.CreateStack();
 
-					table.AddFormItems(
+					stack.AddFormItems(
 						mod.GetTitleTextControlFormItem( false, label: "Article title".ToComponents(), value: info.ArticleId.HasValue ? null : "" ),
 						mod.GetDescriptionTextControlFormItem( false, label: "What's this article about?".ToComponents(), value: info.ArticleId.HasValue ? null : "" ),
 						mod.GetBodyMarkdownTextControlFormItem(
@@ -65,7 +64,7 @@ namespace EwlRealWorld.Website.Pages {
 							value: info.ArticleId.HasValue ? null : "" ),
 						getTagFormItem( tagIds ) );
 
-					ph.AddControlsReturnThis( table );
+					ph.AddControlsReturnThis( stack.ToCollection().GetControls() );
 					EwfUiStatics.SetContentFootActions( new ButtonSetup( "Publish Article" ).ToCollection() );
 				} );
 		}
@@ -92,29 +91,25 @@ namespace EwlRealWorld.Website.Pages {
 			var addUpdateRegions = new UpdateRegionSet();
 			var tagName = new DataValue<string>();
 			var removeUpdateRegions = new UpdateRegionSet();
-			return FormItem.Create(
-				"Enter tags",
-				new PlaceHolder().AddControlsReturnThis(
-					new NamingPlaceholder(
-							FormState.ExecuteWithDataModificationsAndDefaultAction(
-									PostBack.CreateIntermediate( addUpdateRegions.ToCollection(), id: "addTag", firstModificationMethod: () => addTag( tagIds, tagName ) )
-										.ToCollection(),
-									() => new TextControl(
-										"",
-										false,
-										maxLength: TagsTable.TagNameColumn.Size,
-										validationMethod: ( postBackValue, validator ) => tagName.Value = postBackValue ) )
-								.ToFormItem()
-								.ToControl()
+			return new FlowIdContainer(
+					FormState.ExecuteWithDataModificationsAndDefaultAction(
+							PostBack.CreateIntermediate( addUpdateRegions.ToCollection(), id: "addTag", firstModificationMethod: () => addTag( tagIds, tagName ) )
 								.ToCollection(),
-							updateRegionSets: addUpdateRegions.ToCollection() ).ToCollection()
-						.Concat(
-							new LineBreak().ToCollection<PhrasingComponent>()
-								.Append(
-									new PhrasingIdContainer(
-										getTagListComponents( tagIds, removeUpdateRegions ),
-										updateRegionSets: addUpdateRegions.ToCollection().Append( removeUpdateRegions ) ) )
-								.GetControls() ) ) );
+							() => new TextControl(
+								"",
+								false,
+								maxLength: TagsTable.TagNameColumn.Size,
+								validationMethod: ( postBackValue, validator ) => tagName.Value = postBackValue ) )
+						.ToFormItem()
+						.ToComponentCollection(),
+					updateRegionSets: addUpdateRegions.ToCollection() ).ToCollection<FlowComponent>()
+				.Append( new LineBreak() )
+				.Append(
+					new PhrasingIdContainer(
+						getTagListComponents( tagIds, removeUpdateRegions ),
+						updateRegionSets: addUpdateRegions.ToCollection().Append( removeUpdateRegions ) ) )
+				.Materialize()
+				.ToFormItem( label: "Enter tags".ToComponents() );
 		}
 
 		private void addTag( IEnumerable<int> tagIds, DataValue<string> tagName ) {
