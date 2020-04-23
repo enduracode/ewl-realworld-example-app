@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.UI;
 using EnterpriseWebLibrary;
 using EnterpriseWebLibrary.EnterpriseWebFramework;
-using EnterpriseWebLibrary.EnterpriseWebFramework.Controls;
 using EnterpriseWebLibrary.EnterpriseWebFramework.Ui;
 using EwlRealWorld.Library.DataAccess.Retrieval;
 using EwlRealWorld.Library.DataAccess.TableRetrieval;
@@ -29,16 +27,15 @@ namespace EwlRealWorld.Website.Pages {
 					? new HyperlinkSetup( Pages.User.GetInfo(), "Edit Profile Settings", icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-cog" ) ) ).ToCollection()
 					: AppStatics.GetFollowAction( info.UserId ).ToCollection() );
 
-			ph.AddControlsReturnThis( getArticleSection() );
+			ph.AddControlsReturnThis( getArticleSection().ToCollection().GetControls() );
 		}
 
-		private Control getArticleSection() =>
-			new LegacySection(
+		private FlowComponent getArticleSection() =>
+			new Section(
 				new LineList(
 						new[] { getAuthorTabComponents(), getFavoriteTabComponents() }.Select( i => (LineListItem)i.ToComponentListItem() ),
-						verticalAlignment: FlexboxVerticalAlignment.Center ).ToCollection()
-					.GetControls()
-					.Append( getResultTable() ) );
+						verticalAlignment: FlexboxVerticalAlignment.Center ).Append( getResultTable() )
+					.Materialize() );
 
 		private IReadOnlyCollection<PhrasingComponent> getAuthorTabComponents() {
 			const string label = "My Articles";
@@ -62,7 +59,7 @@ namespace EwlRealWorld.Website.Pages {
 					       .ToCollection();
 		}
 
-		private Control getResultTable() {
+		private FlowComponent getResultTable() {
 			var results = info.ShowFavorites ? ArticlesRetrieval.GetRowsLinkedToUser( info.UserId ) : ArticlesRetrieval.GetRowsLinkedToAuthor( info.UserId );
 			var usersById = UsersTableRetrieval.GetRows().ToIdDictionary();
 			var tagsByArticleId = ArticleTagsTableRetrieval.GetRows().ToArticleIdLookup();

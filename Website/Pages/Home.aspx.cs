@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.UI;
 using EnterpriseWebLibrary;
 using EnterpriseWebLibrary.EnterpriseWebFramework;
-using EnterpriseWebLibrary.EnterpriseWebFramework.Controls;
 using EwlRealWorld.Library;
 using EwlRealWorld.Library.DataAccess.Retrieval;
 using EwlRealWorld.Library.DataAccess.TableRetrieval;
@@ -25,23 +23,22 @@ namespace EwlRealWorld.Website.Pages {
 
 			var resultUpdateRegions = new UpdateRegionSet();
 			ph.AddControlsReturnThis(
-				new Block(
-					getArticleSection( resultUpdateRegions ).ToCollection().Concat( getTagSection( resultUpdateRegions ).ToCollection().GetControls() ).ToArray() )
-					{
-						CssClass = CssClasses.HomeContainer
-					} );
+				new GenericFlowContainer(
+						getArticleSection( resultUpdateRegions ).Append( getTagSection( resultUpdateRegions ) ).Materialize(),
+						classes: ElementClasses.HomeContainer ).ToCollection()
+					.GetControls() );
 		}
 
-		private Control getArticleSection( UpdateRegionSet resultUpdateRegions ) {
+		private FlowComponent getArticleSection( UpdateRegionSet resultUpdateRegions ) {
 			var filter = getFilter( AppTools.User != null ? "user" : "global" );
-			return new LegacySection(
+			return new Section(
 				new LineList(
 						new[] { getUserTabComponents( filter, resultUpdateRegions ), getGlobalTabComponents( filter, resultUpdateRegions ), getTagTabComponents( filter ) }
 							.Where( i => i.Any() )
 							.Select( i => (LineListItem)i.ToComponentListItem() ),
-						verticalAlignment: FlexboxVerticalAlignment.Center ).ToCollection()
-					.GetControls()
-					.Append( new NamingPlaceholder( getResultTable( filter ).ToCollection(), updateRegionSets: resultUpdateRegions.ToCollection() ) ) );
+						verticalAlignment: FlexboxVerticalAlignment.Center ).Append<FlowComponent>(
+						new FlowIdContainer( getResultTable( filter ).ToCollection(), updateRegionSets: resultUpdateRegions.ToCollection() ) )
+					.Materialize() );
 		}
 
 		private IReadOnlyCollection<PhrasingComponent> getUserTabComponents( string filter, UpdateRegionSet resultUpdateRegions ) {
@@ -78,7 +75,7 @@ namespace EwlRealWorld.Website.Pages {
 					.Materialize()
 				: Enumerable.Empty<PhrasingComponent>().Materialize();
 
-		private Control getResultTable( string filter ) {
+		private FlowComponent getResultTable( string filter ) {
 			var results = filter == "user" && AppTools.User != null ? ArticlesRetrieval.GetRowsLinkedToFollower( AppTools.User.UserId ) :
 			              filter.StartsWith( "tag" ) ? ArticlesRetrieval.GetRowsLinkedToTag( int.Parse( filter.Substring( 3 ) ) ) :
 			              ArticlesRetrieval.GetRowsOrderedByCreation();
