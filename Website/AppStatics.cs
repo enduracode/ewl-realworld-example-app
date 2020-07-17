@@ -26,7 +26,7 @@ namespace EwlRealWorld.Website {
 
 			components.Add(
 				new GenericFlowContainer(
-					new EwfHyperlink( Article.GetInfo( article.ArticleId ), new StandardHyperlinkStyle( "Read more..." ) ).ToCollection()
+					new EwfHyperlink( Article.GetInfo( article.ArticleId ), new StandardHyperlinkStyle( "Read more..." ) )
 						.Concat( GetTagDisplay( article.ArticleId, tagsByArticleId[ article.ArticleId ] ) )
 						.Materialize(),
 					classes: ElementClasses.ArticleListDetail ) );
@@ -41,11 +41,10 @@ namespace EwlRealWorld.Website {
 						new ImageHyperlinkStyle(
 							new ExternalResourceInfo(
 								author.ProfilePictureUrl.Any() ? author.ProfilePictureUrl : "https://static.productionready.io/images/smiley-cyrus.jpg" ),
-							"" ) ).ToCollection<PhrasingComponent>()
-					.Append(
+							"" ) ).Append<PhrasingComponent>(
 						new GenericPhrasingContainer(
-							new EwfHyperlink( Profile.GetInfo( article.AuthorId ), new StandardHyperlinkStyle( author.Username ) ).ToCollection<PhrasingComponent>()
-								.Append( new LineBreak() )
+							new EwfHyperlink( Profile.GetInfo( article.AuthorId ), new StandardHyperlinkStyle( author.Username ) )
+								.Append<PhrasingComponent>( new LineBreak() )
 								.Append(
 									new GenericPhrasingContainer( article.CreationDateAndTime.ToDayMonthYearString( false ).ToComponents(), classes: ElementClasses.Date ) )
 								.Materialize() ) )

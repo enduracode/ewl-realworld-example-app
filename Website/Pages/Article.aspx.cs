@@ -99,8 +99,7 @@ namespace EwlRealWorld.Website.Pages {
 							.Select(
 								i => {
 									var deleteUpdateRegions = new UpdateRegionSet();
-									return new Paragraph( i.BodyText.ToComponents() ).ToCollection<FlowComponent>()
-										.Append( getCommentFooter( i, usersById[ i.AuthorId ], deleteUpdateRegions ) )
+									return new Paragraph( i.BodyText.ToComponents() ).Append( getCommentFooter( i, usersById[ i.AuthorId ], deleteUpdateRegions ) )
 										.Materialize()
 										.ToComponentListItem( i.CommentId.ToString(), removalUpdateRegionSets: deleteUpdateRegions.ToCollection() );
 								} ),
@@ -121,8 +120,7 @@ namespace EwlRealWorld.Website.Pages {
 				return new Paragraph(
 					new EwfHyperlink(
 							EnterpriseWebLibrary.EnterpriseWebFramework.EwlRealWorld.Website.UserManagement.LogIn.GetInfo( Home.GetInfo().GetUrl() ),
-							new StandardHyperlinkStyle( "Sign in" ) ).ToCollection()
-						.Concat( " or ".ToComponents() )
+							new StandardHyperlinkStyle( "Sign in" ) ).Concat( " or ".ToComponents() )
 						.Append( new EwfHyperlink( Pages.User.GetInfo(), new StandardHyperlinkStyle( "sign up" ) ) )
 						.Concat( " to add comments on this article.".ToComponents() )
 						.Materialize() ).ToCollection();
@@ -165,13 +163,12 @@ namespace EwlRealWorld.Website.Pages {
 									new ImageHyperlinkStyle(
 										new ExternalResourceInfo(
 											author.ProfilePictureUrl.Any() ? author.ProfilePictureUrl : "https://static.productionready.io/images/smiley-cyrus.jpg" ),
-										"" ) ).ToCollection() ).ToCollection<PhrasingComponent>()
+										"" ) ).ToCollection() )
 							.Append(
 								new GenericPhrasingContainer(
 									new EwfHyperlink( Profile.GetInfo( comment.AuthorId ), new StandardHyperlinkStyle( author.Username ) ).ToCollection() ) )
 							.Append( new GenericPhrasingContainer( comment.CreationDateAndTime.ToDayMonthYearString( false ).ToComponents() ) )
-							.Materialize() ).ToCollection<FlowComponent>()
-					.Concat(
+							.Materialize() ).Concat<FlowComponent>(
 						comment.AuthorId == AppTools.User?.UserId
 							? new EwfButton(
 									new StandardButtonStyle( "Delete", icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-trash" ) ) ),

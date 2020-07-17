@@ -54,15 +54,18 @@ namespace EwlRealWorld.Website.Pages {
 				() => {
 					var stack = FormItemList.CreateStack();
 
-					stack.AddFormItems(
-						mod.GetTitleTextControlFormItem( false, label: "Article title".ToComponents(), value: info.ArticleId.HasValue ? null : "" ),
-						mod.GetDescriptionTextControlFormItem( false, label: "What's this article about?".ToComponents(), value: info.ArticleId.HasValue ? null : "" ),
-						mod.GetBodyMarkdownTextControlFormItem(
-							false,
-							label: "Write your article (in markdown)".ToComponents(),
-							controlSetup: TextControlSetup.Create( numberOfRows: 8 ),
-							value: info.ArticleId.HasValue ? null : "" ),
-						getTagFormItem( tagIds ) );
+					stack.AddItems(
+						mod.GetTitleTextControlFormItem( false, label: "Article title".ToComponents(), value: info.ArticleId.HasValue ? null : "" )
+							.Append(
+								mod.GetDescriptionTextControlFormItem( false, label: "What's this article about?".ToComponents(), value: info.ArticleId.HasValue ? null : "" ) )
+							.Append(
+								mod.GetBodyMarkdownTextControlFormItem(
+									false,
+									label: "Write your article (in markdown)".ToComponents(),
+									controlSetup: TextControlSetup.Create( numberOfRows: 8 ),
+									value: info.ArticleId.HasValue ? null : "" ) )
+							.Append( getTagFormItem( tagIds ) )
+							.Materialize() );
 
 					ph.AddControlsReturnThis( stack.ToCollection().GetControls() );
 					EwfUiStatics.SetContentFootActions( new ButtonSetup( "Publish Article" ).ToCollection() );
@@ -102,8 +105,7 @@ namespace EwlRealWorld.Website.Pages {
 								validationMethod: ( postBackValue, validator ) => tagName.Value = postBackValue ) )
 						.ToFormItem()
 						.ToComponentCollection(),
-					updateRegionSets: addUpdateRegions.ToCollection() ).ToCollection<FlowComponent>()
-				.Append( new LineBreak() )
+					updateRegionSets: addUpdateRegions.ToCollection() ).Append<FlowComponent>( new LineBreak() )
 				.Append(
 					new PhrasingIdContainer(
 						getTagListComponents( tagIds, removeUpdateRegions ),
@@ -132,7 +134,7 @@ namespace EwlRealWorld.Website.Pages {
 									postBack: PostBack.CreateIntermediate(
 										removeUpdateRegions.ToCollection(),
 										id: PostBack.GetCompositeId( "removeTag", tagId.ToString() ),
-										firstModificationMethod: () => setTags( tagIds.Where( i => i != tagId ).ToArray() ) ) ) ).ToCollection()
+										firstModificationMethod: () => setTags( tagIds.Where( i => i != tagId ).ToArray() ) ) ) )
 							.Concat( " {0}".FormatWith( TagsTableRetrieval.GetRowMatchingId( tagId ).TagName ).ToComponents() )
 							.Materialize(),
 						classes: ElementClasses.EditorTag ) )

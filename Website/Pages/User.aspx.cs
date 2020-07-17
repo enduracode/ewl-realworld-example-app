@@ -67,18 +67,18 @@ namespace EwlRealWorld.Website.Pages {
 		private FlowComponent getFormItemStack( UsersModification mod, DataValue<string> password ) {
 			var stack = FormItemList.CreateStack();
 			if( AppTools.User != null )
-				stack.AddFormItems( mod.GetProfilePictureUrlUrlControlFormItem( true, label: "URL of profile picture".ToComponents() ) );
-			stack.AddFormItems( mod.GetUsernameTextControlFormItem( false, label: "Username".ToComponents(), value: AppTools.User == null ? "" : null ) );
+				stack.AddItem( mod.GetProfilePictureUrlUrlControlFormItem( true, label: "URL of profile picture".ToComponents() ) );
+			stack.AddItem( mod.GetUsernameTextControlFormItem( false, label: "Username".ToComponents(), value: AppTools.User == null ? "" : null ) );
 			if( AppTools.User != null )
-				stack.AddFormItems(
+				stack.AddItem(
 					mod.GetShortBioTextControlFormItem( true, label: "Short bio about you".ToComponents(), controlSetup: TextControlSetup.Create( numberOfRows: 8 ) ) );
-			stack.AddFormItems( mod.GetEmailAddressEmailAddressControlFormItem( false, label: "Email".ToComponents(), value: AppTools.User == null ? "" : null ) );
+			stack.AddItem( mod.GetEmailAddressEmailAddressControlFormItem( false, label: "Email".ToComponents(), value: AppTools.User == null ? "" : null ) );
 
 			if( AppTools.User == null )
-				stack.AddFormItems( password.GetPasswordModificationFormItems().ToArray() );
+				stack.AddItems( password.GetPasswordModificationFormItems() );
 			else {
 				var changePasswordChecked = new DataValue<bool>();
-				stack.AddFormItems(
+				stack.AddItem(
 					changePasswordChecked.ToFlowCheckbox(
 							"Change password".ToComponents(),
 							setup: FlowCheckboxSetup.Create(

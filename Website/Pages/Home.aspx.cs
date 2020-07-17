@@ -15,8 +15,8 @@ namespace EwlRealWorld.Website.Pages {
 			if( AppTools.User == null )
 				ph.AddControlsReturnThis(
 					new GenericFlowContainer(
-							new GenericFlowContainer( EwfApp.Instance.AppDisplayName.ToComponents() ).ToCollection<FlowComponent>()
-								.Append( new Paragraph( "A place to share your knowledge.".ToComponents() ) )
+							new GenericFlowContainer( EwfApp.Instance.AppDisplayName.ToComponents() )
+								.Append<FlowComponent>( new Paragraph( "A place to share your knowledge.".ToComponents() ) )
 								.Materialize(),
 							classes: ElementClasses.Banner ).ToCollection()
 						.GetControls() );
@@ -70,7 +70,7 @@ namespace EwlRealWorld.Website.Pages {
 
 		private IReadOnlyCollection<PhrasingComponent> getTagTabComponents( string filter ) =>
 			filter.StartsWith( "tag" )
-				? new FontAwesomeIcon( "fa-hashtag" ).ToCollection<PhrasingComponent>()
+				? new FontAwesomeIcon( "fa-hashtag" )
 					.Concat( " {0}".FormatWith( TagsTableRetrieval.GetRowMatchingId( int.Parse( filter.Substring( 3 ) ) ).TagName ).ToComponents() )
 					.Materialize()
 				: Enumerable.Empty<PhrasingComponent>().Materialize();
@@ -101,13 +101,12 @@ namespace EwlRealWorld.Website.Pages {
 				new WrappingList(
 					tags.Select(
 						i => (WrappingListItem)new EwfButton(
-								new StandardButtonStyle( i.TagName, buttonSize: ButtonSize.ShrinkWrap ),
-								behavior: new PostBackBehavior(
-									postBack: PostBack.CreateIntermediate(
-										resultUpdateRegions.ToCollection(),
-										id: PostBack.GetCompositeId( "tag", i.TagId.ToString() ),
-										firstModificationMethod: () => setFilter( "tag{0}".FormatWith( i.TagId ) ) ) ) ).ToCollection()
-							.ToComponentListItem() ),
+							new StandardButtonStyle( i.TagName, buttonSize: ButtonSize.ShrinkWrap ),
+							behavior: new PostBackBehavior(
+								postBack: PostBack.CreateIntermediate(
+									resultUpdateRegions.ToCollection(),
+									id: PostBack.GetCompositeId( "tag", i.TagId.ToString() ),
+									firstModificationMethod: () => setFilter( "tag{0}".FormatWith( i.TagId ) ) ) ) ).ToComponentListItem() ),
 					generalSetup: new ComponentListSetup( classes: ElementClasses.Tag ) ).ToCollection(),
 				style: SectionStyle.Box );
 		}
