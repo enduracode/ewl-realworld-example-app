@@ -41,8 +41,8 @@
     <Reference Include="DocumentFormat.OpenXml, Version=2.11.2.0, Culture=neutral, PublicKeyToken=8fb06cb64d019a17, processorArchitecture=MSIL">
       <HintPath>..\packages\DocumentFormat.OpenXml.2.11.2\lib\net46\DocumentFormat.OpenXml.dll</HintPath>
     </Reference>
-    <Reference Include="EnterpriseWebLibrary, Version=64.0.219.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ewl.64.0.0\lib\net472-full\EnterpriseWebLibrary.dll</HintPath>
+    <Reference Include="EnterpriseWebLibrary, Version=65.0.223.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ewl.65.0.0\lib\net472-full\EnterpriseWebLibrary.dll</HintPath>
     </Reference>
     <Reference Include="ExcelNumberFormat, Version=1.0.10.0, Culture=neutral, PublicKeyToken=23c6f5d73be07eca, processorArchitecture=MSIL">
       <HintPath>..\packages\ExcelNumberFormat.1.0.10\lib\net20\ExcelNumberFormat.dll</HintPath>
@@ -196,7 +196,6 @@
   <ItemGroup>
     <Compile Include="Configuration\Providers\General.cs" />
     <Compile Include="Configuration\Providers\UserManagement.cs" />
-    <Compile Include="DataAccess\MainSequence.cs" />
     <Compile Include="DataAccess\Retrieval\ArticlesRetrieval.cs" />
     <Compile Include="DataAccess\TableRetrieval\ArticleTagsTableRetrieval.cs" />
     <Compile Include="DataAccess\TableRetrieval\FavoritesTableRetrieval.cs" />

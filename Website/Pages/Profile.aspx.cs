@@ -66,7 +66,7 @@ namespace EwlRealWorld.Website.Pages {
 			var favoritesByArticleId = FavoritesTableRetrieval.GetRows().ToArticleIdLookup();
 
 			var table = EwfTable.Create( defaultItemLimit: DataRowLimit.Fifty );
-			table.AddData( results, i => new EwfTableItem( AppStatics.GetArticleDisplay( i, usersById, tagsByArticleId, favoritesByArticleId ).ToCell() ) );
+			table.AddData( results, i => EwfTableItem.Create( AppStatics.GetArticleDisplay( i, usersById, tagsByArticleId, favoritesByArticleId ).ToCell() ) );
 			return table;
 		}
 	}
