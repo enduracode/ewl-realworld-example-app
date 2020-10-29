@@ -9,6 +9,7 @@ using EwlRealWorld.Library.DataAccess.Retrieval;
 using EwlRealWorld.Library.DataAccess.TableRetrieval;
 using EwlRealWorld.Website.Pages;
 using Humanizer;
+using Tewl.Tools;
 
 namespace EwlRealWorld.Website {
 	internal static class AppStatics {
@@ -39,8 +40,7 @@ namespace EwlRealWorld.Website {
 				new EwfHyperlink(
 						Profile.GetInfo( article.AuthorId ),
 						new ImageHyperlinkStyle(
-							new ExternalResourceInfo(
-								author.ProfilePictureUrl.Any() ? author.ProfilePictureUrl : "https://static.productionready.io/images/smiley-cyrus.jpg" ),
+							new ExternalResource( author.ProfilePictureUrl.Any() ? author.ProfilePictureUrl : "https://static.productionready.io/images/smiley-cyrus.jpg" ),
 							"" ) ).Append<PhrasingComponent>(
 						new GenericPhrasingContainer(
 							new EwfHyperlink( Profile.GetInfo( article.AuthorId ), new StandardHyperlinkStyle( author.Username ) )

@@ -9,6 +9,7 @@ using EnterpriseWebLibrary.EnterpriseWebFramework.UserManagement;
 using EwlRealWorld.Library.DataAccess;
 using EwlRealWorld.Library.DataAccess.Modification;
 using EwlRealWorld.Library.DataAccess.TableRetrieval;
+using Tewl.Tools;
 
 namespace EwlRealWorld.Website.Pages {
 	partial class User: EwfPage {

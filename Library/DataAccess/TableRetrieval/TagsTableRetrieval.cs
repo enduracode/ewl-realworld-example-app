@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using EnterpriseWebLibrary;
+using Tewl.Tools;
 
 namespace EwlRealWorld.Library.DataAccess.TableRetrieval {
 	partial class TagsTableRetrieval {

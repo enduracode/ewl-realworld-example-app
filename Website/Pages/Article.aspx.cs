@@ -13,6 +13,7 @@ using EwlRealWorld.Library.DataAccess.Retrieval;
 using EwlRealWorld.Library.DataAccess.TableRetrieval;
 using Humanizer;
 using Markdig;
+using Tewl.Tools;
 
 // Parameter: int articleId
 
@@ -161,7 +162,7 @@ namespace EwlRealWorld.Website.Pages {
 								new EwfHyperlink(
 									Profile.GetInfo( comment.AuthorId ),
 									new ImageHyperlinkStyle(
-										new ExternalResourceInfo(
+										new ExternalResource(
 											author.ProfilePictureUrl.Any() ? author.ProfilePictureUrl : "https://static.productionready.io/images/smiley-cyrus.jpg" ),
 										"" ) ).ToCollection() )
 							.Append(

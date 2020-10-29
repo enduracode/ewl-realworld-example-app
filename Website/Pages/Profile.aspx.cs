@@ -5,6 +5,7 @@ using EnterpriseWebLibrary.EnterpriseWebFramework;
 using EnterpriseWebLibrary.EnterpriseWebFramework.Ui;
 using EwlRealWorld.Library.DataAccess.Retrieval;
 using EwlRealWorld.Library.DataAccess.TableRetrieval;
+using Tewl.Tools;
 
 // Parameter: int userId
 // OptionalParameter: bool showFavorites

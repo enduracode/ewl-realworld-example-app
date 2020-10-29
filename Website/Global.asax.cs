@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using EnterpriseWebLibrary;
 using EnterpriseWebLibrary.EnterpriseWebFramework;
 using EwlRealWorld.Library;
 using EwlRealWorld.Website.Pages;
+using Tewl.Tools;
 
 namespace EwlRealWorld.Website {
 	public class Global: EwfApp {
