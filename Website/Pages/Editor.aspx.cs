@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using EnterpriseWebLibrary;
 using EnterpriseWebLibrary.EnterpriseWebFramework;
-using EnterpriseWebLibrary.EnterpriseWebFramework.Ui;
 using EwlRealWorld.Library;
 using EwlRealWorld.Library.DataAccess;
 using EwlRealWorld.Library.DataAccess.CommandConditions;
@@ -31,13 +30,13 @@ namespace EwlRealWorld.Website.Pages {
 			protected override bool userCanAccessResource => AppTools.User != null && ( !ArticleId.HasValue || Article.AuthorId == AppTools.User.UserId );
 		}
 
-		protected override void loadData() {
+		protected override PageContent getContent() {
 			var mod = getMod();
 			var tagIds = getTags(
 				info.ArticleId.HasValue ? ArticleTagsTableRetrieval.GetRowsLinkedToArticle( info.ArticleId.Value ).Select( i => i.TagId ) : Enumerable.Empty<int>() );
-			FormState.ExecuteWithDataModificationsAndDefaultAction(
+			return FormState.ExecuteWithDataModificationsAndDefaultAction(
 				PostBack.CreateFull(
-						firstModificationMethod: () => {
+						modificationMethod: () => {
 							if( !info.ArticleId.HasValue ) {
 								mod.ArticleId = MainSequence.GetNextValue();
 								mod.Slug = getSuffixedSlug( mod.Title.ToUrlSlug() );
@@ -68,8 +67,7 @@ namespace EwlRealWorld.Website.Pages {
 							.Append( getTagFormItem( tagIds ) )
 							.Materialize() );
 
-					ph.AddControlsReturnThis( stack.ToCollection().GetControls() );
-					EwfUiStatics.SetContentFootActions( new ButtonSetup( "Publish Article" ).ToCollection() );
+					return new UiPageContent( contentFootActions: new ButtonSetup( "Publish Article" ).ToCollection() ).Add( stack );
 				} );
 		}
 
@@ -97,8 +95,7 @@ namespace EwlRealWorld.Website.Pages {
 			var removeUpdateRegions = new UpdateRegionSet();
 			return new FlowIdContainer(
 					FormState.ExecuteWithDataModificationsAndDefaultAction(
-							PostBack.CreateIntermediate( addUpdateRegions.ToCollection(), id: "addTag", firstModificationMethod: () => addTag( tagIds, tagName ) )
-								.ToCollection(),
+							PostBack.CreateIntermediate( addUpdateRegions.ToCollection(), id: "addTag", modificationMethod: () => addTag( tagIds, tagName ) ).ToCollection(),
 							() => new TextControl(
 								"",
 								false,
@@ -135,7 +132,7 @@ namespace EwlRealWorld.Website.Pages {
 									postBack: PostBack.CreateIntermediate(
 										removeUpdateRegions.ToCollection(),
 										id: PostBack.GetCompositeId( "removeTag", tagId.ToString() ),
-										firstModificationMethod: () => setTags( tagIds.Where( i => i != tagId ).ToArray() ) ) ) )
+										modificationMethod: () => setTags( tagIds.Where( i => i != tagId ).ToArray() ) ) ) )
 							.Concat( " {0}".FormatWith( TagsTableRetrieval.GetRowMatchingId( tagId ).TagName ).ToComponents() )
 							.Materialize(),
 						classes: ElementClasses.EditorTag ) )

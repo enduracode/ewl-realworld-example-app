@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using EnterpriseWebLibrary;
 using EnterpriseWebLibrary.EnterpriseWebFramework;
-using EnterpriseWebLibrary.EnterpriseWebFramework.Ui;
 using EwlRealWorld.Library.DataAccess.Retrieval;
 using EwlRealWorld.Library.DataAccess.TableRetrieval;
 using Tewl.Tools;
@@ -22,14 +21,12 @@ namespace EwlRealWorld.Website.Pages {
 			public override string ResourceName => User.Username;
 		}
 
-		protected override void loadData() {
-			EwfUiStatics.SetPageActions(
-				AppTools.User != null && info.UserId == AppTools.User.UserId
-					? new HyperlinkSetup( Pages.User.GetInfo(), "Edit Profile Settings", icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-cog" ) ) ).ToCollection()
-					: AppStatics.GetFollowAction( info.UserId ).ToCollection() );
-
-			ph.AddControlsReturnThis( getArticleSection().ToCollection().GetControls() );
-		}
+		protected override PageContent getContent() =>
+			new UiPageContent(
+				pageActions: AppTools.User != null && info.UserId == AppTools.User.UserId
+					             ? new HyperlinkSetup( Pages.User.GetInfo(), "Edit Profile Settings", icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-cog" ) ) )
+						             .ToCollection()
+					             : AppStatics.GetFollowAction( info.UserId ).ToCollection() ).Add( getArticleSection() );
 
 		private FlowComponent getArticleSection() =>
 			new Section(
@@ -43,10 +40,9 @@ namespace EwlRealWorld.Website.Pages {
 			return !info.ShowFavorites
 				       ? label.ToComponents()
 				       : new EwfButton(
-						       new StandardButtonStyle( label ),
-						       behavior: new PostBackBehavior(
-							       postBack: PostBack.CreateFull( id: "author", firstModificationMethod: () => parametersModification.ShowFavorites = false ) ) )
-					       .ToCollection();
+					       new StandardButtonStyle( label ),
+					       behavior: new PostBackBehavior(
+						       postBack: PostBack.CreateFull( id: "author", modificationMethod: () => parametersModification.ShowFavorites = false ) ) ).ToCollection();
 		}
 
 		private IReadOnlyCollection<PhrasingComponent> getFavoriteTabComponents() {
@@ -54,10 +50,9 @@ namespace EwlRealWorld.Website.Pages {
 			return info.ShowFavorites
 				       ? label.ToComponents()
 				       : new EwfButton(
-						       new StandardButtonStyle( label ),
-						       behavior: new PostBackBehavior(
-							       postBack: PostBack.CreateFull( id: "favorite", firstModificationMethod: () => parametersModification.ShowFavorites = true ) ) )
-					       .ToCollection();
+					       new StandardButtonStyle( label ),
+					       behavior: new PostBackBehavior(
+						       postBack: PostBack.CreateFull( id: "favorite", modificationMethod: () => parametersModification.ShowFavorites = true ) ) ).ToCollection();
 		}
 
 		private FlowComponent getResultTable() {

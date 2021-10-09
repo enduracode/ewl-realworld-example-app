@@ -12,22 +12,24 @@ using Tewl.Tools;
 
 namespace EwlRealWorld.Website.Pages {
 	partial class Home: EwfPage {
-		protected override void loadData() {
+		protected override PageContent getContent() {
+			var content = new UiPageContent();
+
 			if( AppTools.User == null )
-				ph.AddControlsReturnThis(
+				content.Add(
 					new GenericFlowContainer(
-							new GenericFlowContainer( EwfApp.Instance.AppDisplayName.ToComponents() )
-								.Append<FlowComponent>( new Paragraph( "A place to share your knowledge.".ToComponents() ) )
-								.Materialize(),
-							classes: ElementClasses.Banner ).ToCollection()
-						.GetControls() );
+						new GenericFlowContainer( EwfApp.Instance.AppDisplayName.ToComponents() )
+							.Append<FlowComponent>( new Paragraph( "A place to share your knowledge.".ToComponents() ) )
+							.Materialize(),
+						classes: ElementClasses.Banner ) );
 
 			var resultUpdateRegions = new UpdateRegionSet();
-			ph.AddControlsReturnThis(
+			content.Add(
 				new GenericFlowContainer(
-						getArticleSection( resultUpdateRegions ).Append( getTagSection( resultUpdateRegions ) ).Materialize(),
-						classes: ElementClasses.HomeContainer ).ToCollection()
-					.GetControls() );
+					getArticleSection( resultUpdateRegions ).Append( getTagSection( resultUpdateRegions ) ).Materialize(),
+					classes: ElementClasses.HomeContainer ) );
+
+			return content;
 		}
 
 		private FlowComponent getArticleSection( UpdateRegionSet resultUpdateRegions ) {
@@ -47,12 +49,13 @@ namespace EwlRealWorld.Website.Pages {
 			return AppTools.User != null
 				       ? filter == "user" ? label.ToComponents() :
 				         new EwfButton(
-					         new StandardButtonStyle( label ),
-					         behavior: new PostBackBehavior(
-						         postBack: PostBack.CreateIntermediate(
-							         resultUpdateRegions.ToCollection(),
-							         id: "user",
-							         firstModificationMethod: () => setFilter( "user" ) ) ) ).ToCollection()
+						         new StandardButtonStyle( label ),
+						         behavior: new PostBackBehavior(
+							         postBack: PostBack.CreateIntermediate(
+								         resultUpdateRegions.ToCollection(),
+								         id: "user",
+								         modificationMethod: () => setFilter( "user" ) ) ) )
+					         .ToCollection()
 				       : Enumerable.Empty<PhrasingComponent>().Materialize();
 		}
 
@@ -66,7 +69,7 @@ namespace EwlRealWorld.Website.Pages {
 						       postBack: PostBack.CreateIntermediate(
 							       resultUpdateRegions.ToCollection(),
 							       id: "global",
-							       firstModificationMethod: () => setFilter( "global" ) ) ) ).ToCollection();
+							       modificationMethod: () => setFilter( "global" ) ) ) ).ToCollection();
 		}
 
 		private IReadOnlyCollection<PhrasingComponent> getTagTabComponents( string filter ) =>
@@ -107,7 +110,7 @@ namespace EwlRealWorld.Website.Pages {
 								postBack: PostBack.CreateIntermediate(
 									resultUpdateRegions.ToCollection(),
 									id: PostBack.GetCompositeId( "tag", i.TagId.ToString() ),
-									firstModificationMethod: () => setFilter( "tag{0}".FormatWith( i.TagId ) ) ) ) ).ToComponentListItem() ),
+									modificationMethod: () => setFilter( "tag{0}".FormatWith( i.TagId ) ) ) ) ).ToComponentListItem() ),
 					generalSetup: new ComponentListSetup( classes: ElementClasses.Tag ) ).ToCollection(),
 				style: SectionStyle.Box );
 		}

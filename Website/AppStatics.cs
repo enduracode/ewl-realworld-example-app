@@ -67,7 +67,7 @@ namespace EwlRealWorld.Website {
 						postBack: PostBack.CreateIntermediate(
 							rs.ToCollection(),
 							id: PostBack.GetCompositeId( "favorite", article.ArticleId.ToString() ),
-							firstModificationMethod: () => FavoritesModification.InsertRow( AppTools.User.UserId, article.ArticleId ) ) ) );
+							modificationMethod: () => FavoritesModification.InsertRow( AppTools.User.UserId, article.ArticleId ) ) ) );
 			else
 				button = new EwfButton(
 					new StandardButtonStyle( count, icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-heart" ) ) ),
@@ -75,7 +75,7 @@ namespace EwlRealWorld.Website {
 						postBack: PostBack.CreateIntermediate(
 							rs.ToCollection(),
 							id: PostBack.GetCompositeId( "unfavorite", article.ArticleId.ToString() ),
-							firstModificationMethod: () => FavoritesModification.DeleteRows(
+							modificationMethod: () => FavoritesModification.DeleteRows(
 								new FavoritesTableEqualityConditions.UserId( AppTools.User.UserId ),
 								new FavoritesTableEqualityConditions.ArticleId( article.ArticleId ) ) ) ) );
 			return new PhrasingIdContainer( button.ToCollection(), updateRegionSets: rs.ToCollection() );
@@ -101,12 +101,10 @@ namespace EwlRealWorld.Website {
 					       text,
 					       behavior: new PostBackBehavior(
 						       postBack: FollowsTableRetrieval.GetRowMatchingPk( AppTools.User.UserId, userId, returnNullIfNoMatch: true ) == null
-							                 ? PostBack.CreateFull(
-								                 id: "follow",
-								                 firstModificationMethod: () => FollowsModification.InsertRow( AppTools.User.UserId, userId ) )
+							                 ? PostBack.CreateFull( id: "follow", modificationMethod: () => FollowsModification.InsertRow( AppTools.User.UserId, userId ) )
 							                 : PostBack.CreateFull(
 								                 id: "unfollow",
-								                 firstModificationMethod: () => FollowsModification.DeleteRows(
+								                 modificationMethod: () => FollowsModification.DeleteRows(
 									                 new FollowsTableEqualityConditions.FollowerId( AppTools.User.UserId ),
 									                 new FollowsTableEqualityConditions.FolloweeId( userId ) ) ) ),
 					       icon: icon );

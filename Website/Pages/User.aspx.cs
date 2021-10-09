@@ -4,7 +4,6 @@ using System.Linq;
 using EnterpriseWebLibrary;
 using EnterpriseWebLibrary.Encryption;
 using EnterpriseWebLibrary.EnterpriseWebFramework;
-using EnterpriseWebLibrary.EnterpriseWebFramework.Ui;
 using EnterpriseWebLibrary.EnterpriseWebFramework.UserManagement;
 using EwlRealWorld.Library.DataAccess;
 using EwlRealWorld.Library.DataAccess.Modification;
@@ -17,20 +16,13 @@ namespace EwlRealWorld.Website.Pages {
 			public override string ResourceName => AppTools.User != null ? "Your Settings" : "Sign up";
 		}
 
-		protected override void loadData() {
-			if( AppTools.User == null )
-				ph.AddControlsReturnThis(
-					new EwfHyperlink(
-							EnterpriseWebLibrary.EnterpriseWebFramework.EwlRealWorld.Website.UserManagement.LogIn.GetInfo( Home.GetInfo().GetUrl() ),
-							new StandardHyperlinkStyle( "Have an account?" ) ).ToCollection()
-						.GetControls() );
-
+		protected override PageContent getContent() {
 			var mod = getMod();
 			var password = new DataValue<string> { Value = "" };
 			Tuple<IReadOnlyCollection<EtherealComponent>, Action<int>> logInHiddenFieldsAndMethod = null;
-			FormState.ExecuteWithDataModificationsAndDefaultAction(
+			return FormState.ExecuteWithDataModificationsAndDefaultAction(
 				PostBack.CreateFull(
-						firstModificationMethod: () => {
+						modificationMethod: () => {
 							if( AppTools.User == null )
 								mod.UserId = MainSequence.GetNextValue();
 							if( password.Value.Any() ) {
@@ -45,13 +37,22 @@ namespace EwlRealWorld.Website.Pages {
 						actionGetter: () => new PostBackAction( logInHiddenFieldsAndMethod != null ? (PageInfo)Home.GetInfo() : Profile.GetInfo( AppTools.User.UserId ) ) )
 					.ToCollection(),
 				() => {
-					ph.AddControlsReturnThis( getFormItemStack( mod, password ).ToCollection().GetControls() );
-					EwfUiStatics.SetContentFootActions( new ButtonSetup( AppTools.User != null ? "Update Settings" : "Sign up" ).ToCollection() );
+					var content = new UiPageContent( contentFootActions: new ButtonSetup( AppTools.User != null ? "Update Settings" : "Sign up" ).ToCollection() );
+
+					if( AppTools.User == null )
+						content.Add(
+							new EwfHyperlink(
+								EnterpriseWebLibrary.EnterpriseWebFramework.EwlRealWorld.Website.UserManagement.LogIn.GetInfo( Home.GetInfo().GetUrl() ),
+								new StandardHyperlinkStyle( "Have an account?" ) ) );
+
+					content.Add( getFormItemStack( mod, password ) );
 
 					if( AppTools.User == null ) {
 						logInHiddenFieldsAndMethod = FormsAuthStatics.GetLogInHiddenFieldsAndSpecifiedUserLogInMethod();
-						logInHiddenFieldsAndMethod.Item1.AddEtherealControls( ph );
+						content.Add( logInHiddenFieldsAndMethod.Item1 );
 					}
+
+					return content;
 				} );
 		}
 
