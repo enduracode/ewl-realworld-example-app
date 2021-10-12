@@ -15,8 +15,6 @@ using Tewl.Tools;
 
 // Parameter: int? articleId
 
-// PageState: IEnumerable<int> tags
-
 namespace EwlRealWorld.Website.Pages {
 	partial class Editor: EwfPage {
 		partial class Info {
@@ -32,8 +30,13 @@ namespace EwlRealWorld.Website.Pages {
 
 		protected override PageContent getContent() {
 			var mod = getMod();
-			var tagIds = getTags(
-				info.ArticleId.HasValue ? ArticleTagsTableRetrieval.GetRowsLinkedToArticle( info.ArticleId.Value ).Select( i => i.TagId ) : Enumerable.Empty<int>() );
+			var tagIds = ComponentStateItem.Create(
+				"tags",
+				info.ArticleId.HasValue
+					? ArticleTagsTableRetrieval.GetRowsLinkedToArticle( info.ArticleId.Value ).Select( i => i.TagId ).Materialize()
+					: Enumerable.Empty<int>().Materialize(),
+				v => v.All( id => TagsTableRetrieval.GetRowMatchingId( id, returnNullIfNoMatch: true ) != null ),
+				true );
 			return FormState.ExecuteWithDataModificationsAndDefaultAction(
 				PostBack.CreateFull(
 						modificationMethod: () => {
@@ -46,13 +49,13 @@ namespace EwlRealWorld.Website.Pages {
 
 							if( info.ArticleId.HasValue )
 								ArticleTagsModification.DeleteRows( new ArticleTagsTableEqualityConditions.ArticleId( info.ArticleId.Value ) );
-							foreach( var i in tagIds )
+							foreach( var i in tagIds.Value.Value )
 								ArticleTagsModification.InsertRow( mod.ArticleId, i );
 						},
 						actionGetter: () => new PostBackAction( Article.GetInfo( mod.ArticleId ) ) )
 					.ToCollection(),
 				() => {
-					var stack = FormItemList.CreateStack();
+					var stack = FormItemList.CreateStack( generalSetup: new FormItemListSetup( etherealContent: tagIds.ToCollection() ) );
 
 					stack.AddItems(
 						mod.GetTitleTextControlFormItem( false, label: "Article title".ToComponents(), value: info.ArticleId.HasValue ? null : "" )
@@ -64,7 +67,7 @@ namespace EwlRealWorld.Website.Pages {
 									label: "Write your article (in markdown)".ToComponents(),
 									controlSetup: TextControlSetup.Create( numberOfRows: 8 ),
 									value: info.ArticleId.HasValue ? null : "" ) )
-							.Append( getTagFormItem( tagIds ) )
+							.Append( getTagFormItem( tagIds.Value ) )
 							.Materialize() );
 
 					return new UiPageContent( contentFootActions: new ButtonSetup( "Publish Article" ).ToCollection() ).Add( stack );
@@ -89,7 +92,7 @@ namespace EwlRealWorld.Website.Pages {
 			}
 		}
 
-		private FormItem getTagFormItem( IEnumerable<int> tagIds ) {
+		private FormItem getTagFormItem( DataValue<IReadOnlyCollection<int>> tagIds ) {
 			var addUpdateRegions = new UpdateRegionSet();
 			var tagName = new DataValue<string>();
 			var removeUpdateRegions = new UpdateRegionSet();
@@ -112,19 +115,19 @@ namespace EwlRealWorld.Website.Pages {
 				.ToFormItem( label: "Enter tags".ToComponents() );
 		}
 
-		private void addTag( IEnumerable<int> tagIds, DataValue<string> tagName ) {
+		private void addTag( DataValue<IReadOnlyCollection<int>> tagIds, DataValue<string> tagName ) {
 			var tagId = TagsTableRetrieval.GetAllRows().MatchingName( tagName.Value )?.TagId;
 			if( !tagId.HasValue ) {
 				tagId = MainSequence.GetNextValue();
 				TagsModification.InsertRow( tagId.Value, tagName.Value );
 			}
 
-			if( !tagIds.Contains( tagId.Value ) )
-				setTags( tagIds.Append( tagId.Value ).ToArray() );
+			if( !tagIds.Value.Contains( tagId.Value ) )
+				tagIds.Value = tagIds.Value.Append( tagId.Value ).Materialize();
 		}
 
-		private IReadOnlyCollection<PhrasingComponent> getTagListComponents( IEnumerable<int> tagIds, UpdateRegionSet removeUpdateRegions ) =>
-			tagIds.Select(
+		private IReadOnlyCollection<PhrasingComponent> getTagListComponents( DataValue<IReadOnlyCollection<int>> tagIds, UpdateRegionSet removeUpdateRegions ) =>
+			tagIds.Value.Select(
 					tagId => new GenericPhrasingContainer(
 						new EwfButton(
 								new CustomButtonStyle( children: new FontAwesomeIcon( "fa-times" ).ToCollection() ),
@@ -132,7 +135,7 @@ namespace EwlRealWorld.Website.Pages {
 									postBack: PostBack.CreateIntermediate(
 										removeUpdateRegions.ToCollection(),
 										id: PostBack.GetCompositeId( "removeTag", tagId.ToString() ),
-										modificationMethod: () => setTags( tagIds.Where( i => i != tagId ).ToArray() ) ) ) )
+										modificationMethod: () => tagIds.Value = tagIds.Value.Where( i => i != tagId ).Materialize() ) ) )
 							.Concat( " {0}".FormatWith( TagsTableRetrieval.GetRowMatchingId( tagId ).TagName ).ToComponents() )
 							.Materialize(),
 						classes: ElementClasses.EditorTag ) )

@@ -23,45 +23,47 @@ namespace EwlRealWorld.Website.Pages {
 							.Materialize(),
 						classes: ElementClasses.Banner ) );
 
+			var filter = ComponentStateItem.Create( "filter", AppTools.User != null ? "user" : "global", v => true, false );
 			var resultUpdateRegions = new UpdateRegionSet();
 			content.Add(
 				new GenericFlowContainer(
-					getArticleSection( resultUpdateRegions ).Append( getTagSection( resultUpdateRegions ) ).Materialize(),
-					classes: ElementClasses.HomeContainer ) );
+					getArticleSection( filter.Value, resultUpdateRegions ).Append( getTagSection( filter.Value, resultUpdateRegions ) ).Materialize(),
+					classes: ElementClasses.HomeContainer,
+					etherealContent: filter.ToCollection() ) );
 
 			return content;
 		}
 
-		private FlowComponent getArticleSection( UpdateRegionSet resultUpdateRegions ) {
-			var filter = getFilter( AppTools.User != null ? "user" : "global" );
-			return new Section(
+		private FlowComponent getArticleSection( DataValue<string> filter, UpdateRegionSet resultUpdateRegions ) =>
+			new Section(
 				new LineList(
-						new[] { getUserTabComponents( filter, resultUpdateRegions ), getGlobalTabComponents( filter, resultUpdateRegions ), getTagTabComponents( filter ) }
-							.Where( i => i.Any() )
+						new[]
+								{
+									getUserTabComponents( filter, resultUpdateRegions ), getGlobalTabComponents( filter, resultUpdateRegions ),
+									getTagTabComponents( filter.Value )
+								}.Where( i => i.Any() )
 							.Select( i => (LineListItem)i.ToComponentListItem() ),
 						verticalAlignment: FlexboxVerticalAlignment.Center ).Append<FlowComponent>(
-						new FlowIdContainer( getResultTable( filter ).ToCollection(), updateRegionSets: resultUpdateRegions.ToCollection() ) )
+						new FlowIdContainer( getResultTable( filter.Value ).ToCollection(), updateRegionSets: resultUpdateRegions.ToCollection() ) )
 					.Materialize() );
-		}
 
-		private IReadOnlyCollection<PhrasingComponent> getUserTabComponents( string filter, UpdateRegionSet resultUpdateRegions ) {
+		private IReadOnlyCollection<PhrasingComponent> getUserTabComponents( DataValue<string> filter, UpdateRegionSet resultUpdateRegions ) {
 			const string label = "Your Feed";
 			return AppTools.User != null
-				       ? filter == "user" ? label.ToComponents() :
+				       ? filter.Value == "user" ? label.ToComponents() :
 				         new EwfButton(
-						         new StandardButtonStyle( label ),
-						         behavior: new PostBackBehavior(
-							         postBack: PostBack.CreateIntermediate(
-								         resultUpdateRegions.ToCollection(),
-								         id: "user",
-								         modificationMethod: () => setFilter( "user" ) ) ) )
-					         .ToCollection()
+					         new StandardButtonStyle( label ),
+					         behavior: new PostBackBehavior(
+						         postBack: PostBack.CreateIntermediate(
+							         resultUpdateRegions.ToCollection(),
+							         id: "user",
+							         modificationMethod: () => filter.Value = "user" ) ) ).ToCollection()
 				       : Enumerable.Empty<PhrasingComponent>().Materialize();
 		}
 
-		private IReadOnlyCollection<PhrasingComponent> getGlobalTabComponents( string filter, UpdateRegionSet resultUpdateRegions ) {
+		private IReadOnlyCollection<PhrasingComponent> getGlobalTabComponents( DataValue<string> filter, UpdateRegionSet resultUpdateRegions ) {
 			const string label = "Global Feed";
-			return filter != "user" && !filter.StartsWith( "tag" )
+			return filter.Value != "user" && !filter.Value.StartsWith( "tag" )
 				       ? label.ToComponents()
 				       : new EwfButton(
 					       new StandardButtonStyle( label ),
@@ -69,7 +71,7 @@ namespace EwlRealWorld.Website.Pages {
 						       postBack: PostBack.CreateIntermediate(
 							       resultUpdateRegions.ToCollection(),
 							       id: "global",
-							       modificationMethod: () => setFilter( "global" ) ) ) ).ToCollection();
+							       modificationMethod: () => filter.Value = "global" ) ) ).ToCollection();
 		}
 
 		private IReadOnlyCollection<PhrasingComponent> getTagTabComponents( string filter ) =>
@@ -92,7 +94,7 @@ namespace EwlRealWorld.Website.Pages {
 			return table;
 		}
 
-		private FlowComponent getTagSection( UpdateRegionSet resultUpdateRegions ) {
+		private FlowComponent getTagSection( DataValue<string> filter, UpdateRegionSet resultUpdateRegions ) {
 			var tags = ArticleTagsTableRetrieval.GetRows()
 				.Select( i => i.TagId )
 				.GroupBy( i => i )
@@ -110,7 +112,7 @@ namespace EwlRealWorld.Website.Pages {
 								postBack: PostBack.CreateIntermediate(
 									resultUpdateRegions.ToCollection(),
 									id: PostBack.GetCompositeId( "tag", i.TagId.ToString() ),
-									modificationMethod: () => setFilter( "tag{0}".FormatWith( i.TagId ) ) ) ) ).ToComponentListItem() ),
+									modificationMethod: () => filter.Value = "tag{0}".FormatWith( i.TagId ) ) ) ).ToComponentListItem() ),
 					generalSetup: new ComponentListSetup( classes: ElementClasses.Tag ) ).ToCollection(),
 				style: SectionStyle.Box );
 		}
