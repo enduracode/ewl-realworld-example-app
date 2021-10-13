@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using EnterpriseWebLibrary;
@@ -13,42 +13,43 @@ using EwlRealWorld.Library.DataAccess.TableRetrieval;
 using Humanizer;
 using Tewl.Tools;
 
+// EwlPage
 // Parameter: int? articleId
 
 namespace EwlRealWorld.Website.Pages {
-	partial class Editor: EwfPage {
-		partial class Info {
-			internal ArticlesRetrieval.Row Article { get; private set; }
+	partial class Editor {
+		private ArticlesRetrieval.Row article;
 
-			protected override void init() {
-				if( ArticleId.HasValue )
-					Article = ArticlesRetrieval.GetRowMatchingId( ArticleId.Value );
-			}
-
-			protected override bool userCanAccessResource => AppTools.User != null && ( !ArticleId.HasValue || Article.AuthorId == AppTools.User.UserId );
+		protected override void init() {
+			if( ArticleId.HasValue )
+				article = ArticlesRetrieval.GetRowMatchingId( ArticleId.Value );
 		}
+
+		protected override bool userCanAccessResource => AppTools.User != null && ( !ArticleId.HasValue || article.AuthorId == AppTools.User.UserId );
+
+		protected override UrlHandler getUrlParent() => new Home();
 
 		protected override PageContent getContent() {
 			var mod = getMod();
 			var tagIds = ComponentStateItem.Create(
 				"tags",
-				info.ArticleId.HasValue
-					? ArticleTagsTableRetrieval.GetRowsLinkedToArticle( info.ArticleId.Value ).Select( i => i.TagId ).Materialize()
+				ArticleId.HasValue
+					? ArticleTagsTableRetrieval.GetRowsLinkedToArticle( ArticleId.Value ).Select( i => i.TagId ).Materialize()
 					: Enumerable.Empty<int>().Materialize(),
 				v => v.All( id => TagsTableRetrieval.GetRowMatchingId( id, returnNullIfNoMatch: true ) != null ),
 				true );
 			return FormState.ExecuteWithDataModificationsAndDefaultAction(
 				PostBack.CreateFull(
 						modificationMethod: () => {
-							if( !info.ArticleId.HasValue ) {
+							if( !ArticleId.HasValue ) {
 								mod.ArticleId = MainSequence.GetNextValue();
 								mod.Slug = getSuffixedSlug( mod.Title.ToUrlSlug() );
 								mod.CreationDateAndTime = DateTime.UtcNow;
 							}
 							mod.Execute();
 
-							if( info.ArticleId.HasValue )
-								ArticleTagsModification.DeleteRows( new ArticleTagsTableEqualityConditions.ArticleId( info.ArticleId.Value ) );
+							if( ArticleId.HasValue )
+								ArticleTagsModification.DeleteRows( new ArticleTagsTableEqualityConditions.ArticleId( ArticleId.Value ) );
 							foreach( var i in tagIds.Value.Value )
 								ArticleTagsModification.InsertRow( mod.ArticleId, i );
 						},
@@ -58,15 +59,15 @@ namespace EwlRealWorld.Website.Pages {
 					var stack = FormItemList.CreateStack( generalSetup: new FormItemListSetup( etherealContent: tagIds.ToCollection() ) );
 
 					stack.AddItems(
-						mod.GetTitleTextControlFormItem( false, label: "Article title".ToComponents(), value: info.ArticleId.HasValue ? null : "" )
+						mod.GetTitleTextControlFormItem( false, label: "Article title".ToComponents(), value: ArticleId.HasValue ? null : "" )
 							.Append(
-								mod.GetDescriptionTextControlFormItem( false, label: "What's this article about?".ToComponents(), value: info.ArticleId.HasValue ? null : "" ) )
+								mod.GetDescriptionTextControlFormItem( false, label: "What's this article about?".ToComponents(), value: ArticleId.HasValue ? null : "" ) )
 							.Append(
 								mod.GetBodyMarkdownTextControlFormItem(
 									false,
 									label: "Write your article (in markdown)".ToComponents(),
 									controlSetup: TextControlSetup.Create( numberOfRows: 8 ),
-									value: info.ArticleId.HasValue ? null : "" ) )
+									value: ArticleId.HasValue ? null : "" ) )
 							.Append( getTagFormItem( tagIds.Value ) )
 							.Materialize() );
 
@@ -75,8 +76,8 @@ namespace EwlRealWorld.Website.Pages {
 		}
 
 		private ArticlesModification getMod() {
-			if( info.ArticleId.HasValue )
-				return info.Article.ToModification();
+			if( ArticleId.HasValue )
+				return article.ToModification();
 
 			var mod = ArticlesModification.CreateForInsert();
 			mod.AuthorId = AppTools.User.UserId;

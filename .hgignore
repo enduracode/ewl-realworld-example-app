@@ -5,6 +5,7 @@ syntax: glob
 .vs/EWL RealWorld/v16/Server/sqlite3/
 packages/
 EWL RealWorld.sln.DotSettings.user
+Web Framework Static Files/
 Error Log.txt
 *.csproj.user
 *.ewlt.cs
@@ -19,8 +20,6 @@ Library/Generated Code/
 
 Website/bin/
 Website/obj/
-Website/Ewf/
-Website/Standard Library Files.xml
 Website/Generated Code/
 
 # END-EWL-REGION

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using EnterpriseWebLibrary;
@@ -13,69 +13,70 @@ using Humanizer;
 using Markdig;
 using Tewl.Tools;
 
+// EwlPage
 // Parameter: int articleId
 
 namespace EwlRealWorld.Website.Pages {
-	partial class Article: EwfPage {
-		partial class Info {
-			internal ArticlesRetrieval.Row Article { get; private set; }
+	partial class Article {
+		private ArticlesRetrieval.Row articleRow;
+		private CommentsModification commentMod;
 
-			protected override void init() {
-				Article = ArticlesRetrieval.GetRowMatchingId( ArticleId );
-			}
-
-			public override string ResourceName => Article.Title;
+		protected override void init() {
+			articleRow = ArticlesRetrieval.GetRowMatchingId( ArticleId );
 		}
 
-		private CommentsModification commentMod;
+		public override string ResourceName => articleRow.Title;
+
+		protected override UrlHandler getUrlParent() => new Home();
 
 		protected override PageContent getContent() =>
 			new UiPageContent(
-					pageActions: AppTools.User != null && info.Article.AuthorId == AppTools.User.UserId
+					pageActions: AppTools.User != null && articleRow.AuthorId == AppTools.User.UserId
 						             ? new HyperlinkSetup(
-								             Editor.GetInfo( info.ArticleId ),
+								             Editor.GetInfo( ArticleId ),
 								             "Edit Article",
-								             icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-pencil" ) ) ).Append<ActionComponentSetup>(
+								             icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-pencil" ) ) )
+							             .Append<ActionComponentSetup>(
 								             new ButtonSetup(
 									             "Delete Article",
 									             behavior: new PostBackBehavior(
 										             postBack: PostBack.CreateFull(
 											             id: "delete",
 											             modificationMethod: () => {
-												             ArticleTagsModification.DeleteRows( new ArticleTagsTableEqualityConditions.ArticleId( info.ArticleId ) );
-												             ArticlesModification.DeleteRows( new ArticlesTableEqualityConditions.ArticleId( info.ArticleId ) );
+												             ArticleTagsModification.DeleteRows( new ArticleTagsTableEqualityConditions.ArticleId( ArticleId ) );
+												             ArticlesModification.DeleteRows( new ArticlesTableEqualityConditions.ArticleId( ArticleId ) );
 											             },
 											             actionGetter: () => new PostBackAction( Home.GetInfo() ) ) ),
 									             icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-trash" ) ) ) )
 							             .Materialize()
-						             : AppStatics.GetFollowAction( info.Article.AuthorId ).Append( getFavoriteAction() ).Materialize() )
-				.Add( AppStatics.GetAuthorDisplay( info.Article, UsersTableRetrieval.GetRowMatchingId( info.Article.AuthorId ) ) )
-				.Add( new HtmlBlockContainer( Markdown.ToHtml( info.Article.BodyMarkdown ) ) )
-				.Add( AppStatics.GetTagDisplay( info.ArticleId, ArticleTagsTableRetrieval.GetRowsLinkedToArticle( info.ArticleId ) ) )
+						             : AppStatics.GetFollowAction( articleRow.AuthorId ).Append( getFavoriteAction() ).Materialize() )
+				.Add( AppStatics.GetAuthorDisplay( articleRow, UsersTableRetrieval.GetRowMatchingId( articleRow.AuthorId ) ) )
+				.Add( new HtmlBlockContainer( Markdown.ToHtml( articleRow.BodyMarkdown ) ) )
+				.Add( AppStatics.GetTagDisplay( ArticleId, ArticleTagsTableRetrieval.GetRowsLinkedToArticle( ArticleId ) ) )
 				.Add( getCommentComponents() );
 
 		private ActionComponentSetup getFavoriteAction() {
 			var text = "{0} Article ({1})".FormatWith(
-				AppTools.User == null || FavoritesTableRetrieval.GetRowMatchingPk( AppTools.User.UserId, info.ArticleId, returnNullIfNoMatch: true ) == null
+				AppTools.User == null || FavoritesTableRetrieval.GetRowMatchingPk( AppTools.User.UserId, ArticleId, returnNullIfNoMatch: true ) == null
 					? "Favorite"
 					: "Unfavorite",
-				FavoritesTableRetrieval.GetRows( new FavoritesTableEqualityConditions.ArticleId( info.ArticleId ) ).Count() );
+				FavoritesTableRetrieval.GetRows( new FavoritesTableEqualityConditions.ArticleId( ArticleId ) ).Count() );
 			var icon = new ActionComponentIcon( new FontAwesomeIcon( "fa-heart" ) );
 
 			return AppTools.User == null
-				       ? (ActionComponentSetup)new HyperlinkSetup( Pages.User.GetInfo(), text, icon: icon )
+				       ? (ActionComponentSetup)new HyperlinkSetup( User.GetInfo(), text, icon: icon )
 				       : new ButtonSetup(
 					       text,
 					       behavior: new PostBackBehavior(
-						       postBack: FavoritesTableRetrieval.GetRowMatchingPk( AppTools.User.UserId, info.ArticleId, returnNullIfNoMatch: true ) == null
+						       postBack: FavoritesTableRetrieval.GetRowMatchingPk( AppTools.User.UserId, ArticleId, returnNullIfNoMatch: true ) == null
 							                 ? PostBack.CreateFull(
 								                 id: "favorite",
-								                 modificationMethod: () => FavoritesModification.InsertRow( AppTools.User.UserId, info.ArticleId ) )
+								                 modificationMethod: () => FavoritesModification.InsertRow( AppTools.User.UserId, ArticleId ) )
 							                 : PostBack.CreateFull(
 								                 id: "unfavorite",
 								                 modificationMethod: () => FavoritesModification.DeleteRows(
 									                 new FavoritesTableEqualityConditions.UserId( AppTools.User.UserId ),
-									                 new FavoritesTableEqualityConditions.ArticleId( info.ArticleId ) ) ) ),
+									                 new FavoritesTableEqualityConditions.ArticleId( ArticleId ) ) ) ),
 					       icon: icon );
 		}
 
@@ -88,7 +89,7 @@ namespace EwlRealWorld.Website.Pages {
 			var usersById = UsersTableRetrieval.GetRows().ToIdDictionary();
 			components.Add(
 				new StackList(
-					CommentsTableRetrieval.GetRows( new CommentsTableEqualityConditions.ArticleId( info.ArticleId ) )
+					CommentsTableRetrieval.GetRows( new CommentsTableEqualityConditions.ArticleId( ArticleId ) )
 						.OrderByDescending( i => i.CommentId )
 						.Select(
 							i => {
@@ -112,9 +113,9 @@ namespace EwlRealWorld.Website.Pages {
 			if( AppTools.User == null )
 				return new Paragraph(
 					new EwfHyperlink(
-							EnterpriseWebLibrary.EnterpriseWebFramework.EwlRealWorld.Website.UserManagement.LogIn.GetInfo( Home.GetInfo().GetUrl() ),
+							EnterpriseWebLibrary.EnterpriseWebFramework.UserManagement.Pages.LogIn.GetInfo( Home.GetInfo().GetUrl() ),
 							new StandardHyperlinkStyle( "Sign in" ) ).Concat( " or ".ToComponents() )
-						.Append( new EwfHyperlink( Pages.User.GetInfo(), new StandardHyperlinkStyle( "sign up" ) ) )
+						.Append( new EwfHyperlink( User.GetInfo(), new StandardHyperlinkStyle( "sign up" ) ) )
 						.Concat( " to add comments on this article.".ToComponents() )
 						.Materialize() ).ToCollection();
 
@@ -142,7 +143,7 @@ namespace EwlRealWorld.Website.Pages {
 		private CommentsModification getCommentMod() {
 			var mod = CommentsModification.CreateForInsert();
 			mod.AuthorId = AppTools.User.UserId;
-			mod.ArticleId = info.ArticleId;
+			mod.ArticleId = ArticleId;
 			mod.CreationDateAndTime = DateTime.UtcNow;
 			return mod;
 		}

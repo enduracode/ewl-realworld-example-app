@@ -6,16 +6,14 @@ using EwlRealWorld.Library.DataAccess.TableRetrieval;
 using EwlRealWorld.Website.Pages;
 
 namespace EwlRealWorld.Website.Providers {
-	internal class EwfUiProvider: AppEwfUiProvider {
+	internal class EwfUi: AppEwfUiProvider {
 		public override IReadOnlyCollection<ActionComponentSetup> GetGlobalNavActions() {
 			if( AppTools.User == null ) {
 				var signUpPage = User.GetInfo();
 				return new[]
 					{
 						new HyperlinkSetup( Home.GetInfo(), "Home" ),
-						new HyperlinkSetup(
-							EnterpriseWebLibrary.EnterpriseWebFramework.EwlRealWorld.Website.UserManagement.LogIn.GetInfo( Home.GetInfo().GetUrl() ),
-							"Sign in" ),
+						new HyperlinkSetup( EnterpriseWebLibrary.EnterpriseWebFramework.UserManagement.Pages.LogIn.GetInfo( Home.GetInfo().GetUrl() ), "Sign in" ),
 						new HyperlinkSetup( signUpPage, signUpPage.ResourceName )
 					}.ToList();
 			}

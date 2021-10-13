@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using EnterpriseWebLibrary;
 using EnterpriseWebLibrary.EnterpriseWebFramework;
@@ -8,18 +8,24 @@ using EwlRealWorld.Library.DataAccess.TableRetrieval;
 using Humanizer;
 using Tewl.Tools;
 
-// PageState: string filter
+// EwlPage
 
 namespace EwlRealWorld.Website.Pages {
-	partial class Home: EwfPage {
+	partial class Home {
+		protected override IEnumerable<UrlPattern> getChildUrlPatterns() =>
+			RequestDispatchingStatics.GetFrameworkUrlPatterns()
+				.Append( User.UrlPatterns.Literal( "user" ) )
+				.Append( Editor.UrlPatterns.Literal( "editor" ) )
+				.Append( Article.UrlPatterns.Literal( "article" ) )
+				.Append( Profile.UrlPatterns.Literal( "profile" ) );
+
 		protected override PageContent getContent() {
 			var content = new UiPageContent();
 
 			if( AppTools.User == null )
 				content.Add(
 					new GenericFlowContainer(
-						new GenericFlowContainer( EwfApp.Instance.AppDisplayName.ToComponents() )
-							.Append<FlowComponent>( new Paragraph( "A place to share your knowledge.".ToComponents() ) )
+						new GenericFlowContainer( "Conduit".ToComponents() ).Append<FlowComponent>( new Paragraph( "A place to share your knowledge.".ToComponents() ) )
 							.Materialize(),
 						classes: ElementClasses.Banner ) );
 

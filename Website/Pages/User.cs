@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using EnterpriseWebLibrary;
@@ -10,11 +10,13 @@ using EwlRealWorld.Library.DataAccess.Modification;
 using EwlRealWorld.Library.DataAccess.TableRetrieval;
 using Tewl.Tools;
 
+// EwlPage
+
 namespace EwlRealWorld.Website.Pages {
-	partial class User: EwfPage {
-		partial class Info {
-			public override string ResourceName => AppTools.User != null ? "Your Settings" : "Sign up";
-		}
+	partial class User {
+		public override string ResourceName => AppTools.User != null ? "Your Settings" : "Sign up";
+
+		protected override UrlHandler getUrlParent() => new Home();
 
 		protected override PageContent getContent() {
 			var mod = getMod();
@@ -34,7 +36,7 @@ namespace EwlRealWorld.Website.Pages {
 
 							logInHiddenFieldsAndMethod?.Item2( mod.UserId );
 						},
-						actionGetter: () => new PostBackAction( logInHiddenFieldsAndMethod != null ? (PageInfo)Home.GetInfo() : Profile.GetInfo( AppTools.User.UserId ) ) )
+						actionGetter: () => new PostBackAction( logInHiddenFieldsAndMethod != null ? (PageBase)Home.GetInfo() : Profile.GetInfo( AppTools.User.UserId ) ) )
 					.ToCollection(),
 				() => {
 					var content = new UiPageContent( contentFootActions: new ButtonSetup( AppTools.User != null ? "Update Settings" : "Sign up" ).ToCollection() );
@@ -42,7 +44,7 @@ namespace EwlRealWorld.Website.Pages {
 					if( AppTools.User == null )
 						content.Add(
 							new EwfHyperlink(
-								EnterpriseWebLibrary.EnterpriseWebFramework.EwlRealWorld.Website.UserManagement.LogIn.GetInfo( Home.GetInfo().GetUrl() ),
+								EnterpriseWebLibrary.EnterpriseWebFramework.UserManagement.Pages.LogIn.GetInfo( Home.GetInfo().GetUrl() ),
 								new StandardHyperlinkStyle( "Have an account?" ) ) );
 
 					content.Add( getFormItemStack( mod, password ) );

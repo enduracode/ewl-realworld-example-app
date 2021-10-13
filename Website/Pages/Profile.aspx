@@ -1,1 +1,0 @@
-<%@ Page Language="C#" CodeBehind="Profile.aspx.cs" Inherits="EwlRealWorld.Website.Pages.Profile" %>

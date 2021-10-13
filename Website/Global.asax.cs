@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using EnterpriseWebLibrary.EnterpriseWebFramework;
 using EwlRealWorld.Library;
-using EwlRealWorld.Website.Pages;
 using Tewl.Tools;
 
 namespace EwlRealWorld.Website {
@@ -19,14 +17,6 @@ namespace EwlRealWorld.Website {
 		}
 
 
-		protected override IEnumerable<ShortcutUrlResolver> GetShortcutUrlResolvers() {
-			yield return new ShortcutUrlResolver( "", ConnectionSecurity.SecureIfPossible, () => Home.GetInfo() );
-		}
-
-		protected override List<ResourceInfo> GetStyleSheets() {
-			return new StylesCss.Info().ToCollection<ResourceInfo>().ToList();
-		}
-
-		public override string AppDisplayName => "Conduit";
+		protected override IEnumerable<BaseUrlPattern> GetBaseUrlPatterns() => Pages.Home.UrlPatterns.BaseUrlPattern().ToCollection();
 	}
 }

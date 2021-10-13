@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using EnterpriseWebLibrary;
 using EnterpriseWebLibrary.EnterpriseWebFramework;
@@ -6,27 +6,28 @@ using EwlRealWorld.Library.DataAccess.Retrieval;
 using EwlRealWorld.Library.DataAccess.TableRetrieval;
 using Tewl.Tools;
 
+// EwlPage
 // Parameter: int userId
 // OptionalParameter: bool showFavorites
 
 namespace EwlRealWorld.Website.Pages {
-	partial class Profile: EwfPage {
-		partial class Info {
-			internal UsersTableRetrieval.Row User { get; private set; }
+	partial class Profile {
+		private UsersTableRetrieval.Row user;
 
-			protected override void init() {
-				User = UsersTableRetrieval.GetRowMatchingId( UserId );
-			}
-
-			public override string ResourceName => User.Username;
+		protected override void init() {
+			user = UsersTableRetrieval.GetRowMatchingId( UserId );
 		}
+
+		public override string ResourceName => user.Username;
+
+		protected override UrlHandler getUrlParent() => new Home();
 
 		protected override PageContent getContent() =>
 			new UiPageContent(
-				pageActions: AppTools.User != null && info.UserId == AppTools.User.UserId
-					             ? new HyperlinkSetup( Pages.User.GetInfo(), "Edit Profile Settings", icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-cog" ) ) )
+				pageActions: AppTools.User != null && UserId == AppTools.User.UserId
+					             ? new HyperlinkSetup( User.GetInfo(), "Edit Profile Settings", icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-cog" ) ) )
 						             .ToCollection()
-					             : AppStatics.GetFollowAction( info.UserId ).ToCollection() ).Add( getArticleSection() );
+					             : AppStatics.GetFollowAction( UserId ).ToCollection() ).Add( getArticleSection() );
 
 		private FlowComponent getArticleSection() =>
 			new Section(
@@ -37,7 +38,7 @@ namespace EwlRealWorld.Website.Pages {
 
 		private IReadOnlyCollection<PhrasingComponent> getAuthorTabComponents() {
 			const string label = "My Articles";
-			return !info.ShowFavorites
+			return !ShowFavorites
 				       ? label.ToComponents()
 				       : new EwfButton(
 					       new StandardButtonStyle( label ),
@@ -47,7 +48,7 @@ namespace EwlRealWorld.Website.Pages {
 
 		private IReadOnlyCollection<PhrasingComponent> getFavoriteTabComponents() {
 			const string label = "Favorited Articles";
-			return info.ShowFavorites
+			return ShowFavorites
 				       ? label.ToComponents()
 				       : new EwfButton(
 					       new StandardButtonStyle( label ),
@@ -56,7 +57,7 @@ namespace EwlRealWorld.Website.Pages {
 		}
 
 		private FlowComponent getResultTable() {
-			var results = info.ShowFavorites ? ArticlesRetrieval.GetRowsLinkedToUser( info.UserId ) : ArticlesRetrieval.GetRowsLinkedToAuthor( info.UserId );
+			var results = ShowFavorites ? ArticlesRetrieval.GetRowsLinkedToUser( UserId ) : ArticlesRetrieval.GetRowsLinkedToAuthor( UserId );
 			var usersById = UsersTableRetrieval.GetRows().ToIdDictionary();
 			var tagsByArticleId = ArticleTagsTableRetrieval.GetRows().ToArticleIdLookup();
 			var favoritesByArticleId = FavoritesTableRetrieval.GetRows().ToArticleIdLookup();

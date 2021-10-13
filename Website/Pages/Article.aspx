@@ -1,1 +1,0 @@
-<%@ Page Language="C#" CodeBehind="Article.aspx.cs" Inherits="EwlRealWorld.Website.Pages.Article" %>
