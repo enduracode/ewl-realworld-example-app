@@ -260,6 +260,7 @@
     <Compile Include="Providers\EwfUi.cs" />
     <Compile Include="Providers\RequestDispatching.cs" />
     <Compile Include="Providers\StandardPageLogic.cs" />
+    <Compile Include="StaticFiles\Logic\StylesCss.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Library\Library.csproj">
