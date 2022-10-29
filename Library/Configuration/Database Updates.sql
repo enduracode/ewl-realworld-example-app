@@ -10,11 +10,22 @@
 	ShortBio varchar( 500 )
 		not null,
 	EmailAddress varchar( 100 )
-		not null,
+		not null
+		constraint UsersEmailAddressUnique unique,
 	Salt int
 		not null,
 	SaltedPassword varbinary( 20 )
-		null
+		null,
+	LoginCodeSalt varbinary( 16 )
+		null,
+	HashedLoginCode varbinary( 20 )
+		null,
+	LoginCodeExpirationDateAndTime datetime2
+		null,
+	LoginCodeRemainingAttemptCount tinyint
+		null,
+	LoginCodeDestinationUrl varchar( 500 )
+		not null
 )
 go
 

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using EnterpriseWebLibrary;
-using EnterpriseWebLibrary.Encryption;
 using EnterpriseWebLibrary.EnterpriseWebFramework;
 using EnterpriseWebLibrary.EnterpriseWebFramework.UserManagement;
 using EwlRealWorld.Library.DataAccess;
@@ -20,23 +17,19 @@ namespace EwlRealWorld.Website.Pages {
 
 		protected override PageContent getContent() {
 			var mod = getMod();
-			var password = new DataValue<string> { Value = "" };
-			Tuple<IReadOnlyCollection<EtherealComponent>, Action<int>> logInHiddenFieldsAndMethod = null;
+			Action<int> passwordUpdater = null;
+			AuthenticationStatics.SpecifiedUserLoginModificationMethod specifiedUserLoginMethod = null;
 			return FormState.ExecuteWithDataModificationsAndDefaultAction(
 				PostBack.CreateFull(
 						modificationMethod: () => {
 							if( AppTools.User == null )
 								mod.UserId = MainSequence.GetNextValue();
-							if( password.Value.Any() ) {
-								var passwordSalter = new Password( password.Value );
-								mod.Salt = passwordSalter.Salt;
-								mod.SaltedPassword = passwordSalter.ComputeSaltedHash();
-							}
 							mod.Execute();
+							passwordUpdater?.Invoke( mod.UserId );
 
-							logInHiddenFieldsAndMethod?.Item2( mod.UserId );
+							specifiedUserLoginMethod?.Invoke( mod.UserId );
 						},
-						actionGetter: () => new PostBackAction( logInHiddenFieldsAndMethod != null ? (PageBase)Home.GetInfo() : Profile.GetInfo( AppTools.User.UserId ) ) )
+						actionGetter: () => new PostBackAction( specifiedUserLoginMethod != null ? (PageBase)Home.GetInfo() : Profile.GetInfo( AppTools.User.UserId ) ) )
 					.ToCollection(),
 				() => {
 					var content = new UiPageContent( contentFootActions: new ButtonSetup( AppTools.User != null ? "Update Settings" : "Sign up" ).ToCollection() );
@@ -47,11 +40,12 @@ namespace EwlRealWorld.Website.Pages {
 								EnterpriseWebLibrary.EnterpriseWebFramework.UserManagement.Pages.LogIn.GetInfo( Home.GetInfo().GetUrl() ),
 								new StandardHyperlinkStyle( "Have an account?" ) ) );
 
-					content.Add( getFormItemStack( mod, password ) );
+					content.Add( getFormItemStack( mod, out passwordUpdater ) );
 
 					if( AppTools.User == null ) {
-						logInHiddenFieldsAndMethod = FormsAuthStatics.GetLogInHiddenFieldsAndSpecifiedUserLogInMethod();
-						content.Add( logInHiddenFieldsAndMethod.Item1 );
+						var logInHiddenFieldsAndMethods = AuthenticationStatics.GetLogInHiddenFieldsAndMethods();
+						content.Add( logInHiddenFieldsAndMethods.hiddenFields );
+						specifiedUserLoginMethod = logInHiddenFieldsAndMethods.modificationMethods.specifiedUserLoginMethod;
 					}
 
 					return content;
@@ -65,11 +59,15 @@ namespace EwlRealWorld.Website.Pages {
 			var mod = UsersModification.CreateForInsert();
 			mod.ProfilePictureUrl = "";
 			mod.ShortBio = "";
+			mod.Salt = 0;
+			mod.LoginCodeDestinationUrl = "";
 			return mod;
 		}
 
-		private FlowComponent getFormItemStack( UsersModification mod, DataValue<string> password ) {
+		private FlowComponent getFormItemStack( UsersModification mod, out Action<int> passwordUpdater ) {
 			var stack = FormItemList.CreateStack();
+			Action<int> passwordUpdaterLocal = null;
+
 			if( AppTools.User != null )
 				stack.AddItem( mod.GetProfilePictureUrlUrlControlFormItem( true, label: "URL of profile picture".ToComponents() ) );
 			stack.AddItem( mod.GetUsernameTextControlFormItem( false, label: "Username".ToComponents(), value: AppTools.User == null ? "" : null ) );
@@ -79,7 +77,7 @@ namespace EwlRealWorld.Website.Pages {
 			stack.AddItem( mod.GetEmailAddressEmailAddressControlFormItem( false, label: "Email".ToComponents(), value: AppTools.User == null ? "" : null ) );
 
 			if( AppTools.User == null )
-				stack.AddItems( password.GetPasswordModificationFormItems() );
+				stack.AddItems( AuthenticationStatics.GetPasswordModificationFormItems( out passwordUpdaterLocal ) );
 			else {
 				var changePasswordChecked = new DataValue<bool>();
 				stack.AddItem(
@@ -88,11 +86,13 @@ namespace EwlRealWorld.Website.Pages {
 							setup: FlowCheckboxSetup.Create(
 								nestedContentGetter: () => FormState.ExecuteWithValidationPredicate(
 									() => changePasswordChecked.Value,
-									() => FormItemList.CreateGrid( 1, items: password.GetPasswordModificationFormItems() ).ToCollection() ) ),
+									() => FormItemList.CreateGrid( 1, items: AuthenticationStatics.GetPasswordModificationFormItems( out passwordUpdaterLocal ) )
+										.ToCollection() ) ),
 							value: false )
 						.ToFormItem() );
 			}
 
+			passwordUpdater = passwordUpdaterLocal;
 			return stack;
 		}
 	}
