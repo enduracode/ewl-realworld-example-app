@@ -1,9 +1,7 @@
 # EWL-REGION
 syntax: glob
 
-.vs/EWL RealWorld/v16/.suo
-.vs/EWL RealWorld/v16/Server/sqlite3/
-packages/
+.vs/
 EWL RealWorld.sln.DotSettings.user
 Web Framework Static Files/
 Error Log.txt
@@ -16,10 +14,14 @@ Solution Files/obj/
 Library/bin/
 Library/obj/
 Library/Configuration/Aspose Licenses/
+Library/Directory.Build.props
 Library/Generated Code/
 
 Website/bin/
 Website/obj/
+Website/web.config
+Website/Directory.Build.props
 Website/Generated Code/
+Website/Properties/launchSettings.json
 
 # END-EWL-REGION
