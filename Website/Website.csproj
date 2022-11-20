@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ewl" Version="75.0.0" />
+    <PackageReference Include="Ewl" Version="76.0.0-pr00289" />
     <PackageReference Include="Markdig" Version="0.30.4" />
   </ItemGroup>
 
