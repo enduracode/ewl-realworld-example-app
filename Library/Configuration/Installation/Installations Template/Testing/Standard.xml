@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <installationStandardConfiguration xmlns="http://redstapler.biz" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                                   xsi:schemaLocation="http://redstapler.biz http://ewl.enterpriseweblibrary.org/ConfigurationSchemas/InstallationStandard">
+                                   xsi:schemaLocation="http://redstapler.biz https://ewl.enterpriseweblibrary.org/ConfigurationSchemas/InstallationStandard">
 	<administrators>
 		<administrator>
 			<Name>Jane Doe</Name>
@@ -11,6 +11,7 @@
 	<installedInstallation>
 		<name>Testing</name>
 		<shortName>Testing</shortName>
+		<DeveloperNotificationEmailFromAddress>enterprise-web-library@notifications.example.com</DeveloperNotificationEmailFromAddress>
 		<InstallationTypeConfiguration xsi:type="IntermediateInstallationConfiguration">
 			<EmailFromName>Your Organization</EmailFromName>
 			<EmailFromAddress>contact@example.com</EmailFromAddress>

@@ -4,11 +4,10 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <AssemblyName>EwlRealWorld.Website</AssemblyName>
     <RootNamespace>EwlRealWorld.Website</RootNamespace>
-    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ewl" Version="76.0.0-pr00289" />
+    <PackageReference Include="Ewl" Version="78.0.0" />
     <PackageReference Include="Markdig" Version="0.30.4" />
   </ItemGroup>
 
