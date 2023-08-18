@@ -1,13 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
-    <AssemblyName>EwlRealWorld.Library</AssemblyName>
-    <RootNamespace>EwlRealWorld.Library</RootNamespace>
-  </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Ewl" Version="78.0.0" />
+    <PackageReference Include="Ewl" Version="79.0.0" />
   </ItemGroup>
 
 </Project>
