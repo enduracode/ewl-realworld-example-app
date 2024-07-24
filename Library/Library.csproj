@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="Ewl" Version="79.0.0" />
+    <PackageReference Include="Ewl" Version="80.0.0" />
   </ItemGroup>
 
 </Project>
