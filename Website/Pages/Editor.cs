@@ -1,4 +1,5 @@
-﻿using EwlRealWorld.Library;
+﻿using EnterpriseWebLibrary.UserManagement;
+using EwlRealWorld.Library;
 using EwlRealWorld.Library.DataAccess;
 using EwlRealWorld.Library.DataAccess.CommandConditions;
 using EwlRealWorld.Library.DataAccess.Modification;
@@ -30,7 +31,7 @@ partial class Editor {
 			ArticleId.HasValue
 				? ArticleTagsTableRetrieval.GetRowsLinkedToArticle( ArticleId.Value ).Select( i => i.TagId ).Materialize()
 				: Enumerable.Empty<int>().Materialize(),
-			v => v.All( id => TagsTableRetrieval.GetRowMatchingId( id, returnNullIfNoMatch: true ) != null ),
+			v => v.All( id => TagsTableRetrieval.TryGetRowMatchingId( id, out _ ) ),
 			true );
 		return FormState.ExecuteWithDataModificationsAndDefaultAction(
 			PostBack.CreateFull(
@@ -73,7 +74,7 @@ partial class Editor {
 			return article.ToModification();
 
 		var mod = ArticlesModification.CreateForInsert();
-		mod.AuthorId = AppTools.User.UserId;
+		mod.AuthorId = SystemUser.Current!.UserId;
 		return mod;
 	}
 

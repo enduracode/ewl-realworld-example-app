@@ -1,4 +1,5 @@
-﻿using EwlRealWorld.Library;
+﻿using EnterpriseWebLibrary.UserManagement;
+using EwlRealWorld.Library;
 using EwlRealWorld.Library.DataAccess;
 using EwlRealWorld.Library.DataAccess.CommandConditions;
 using EwlRealWorld.Library.DataAccess.Modification;
@@ -48,18 +49,16 @@ partial class Article {
 
 	private ActionComponentSetup getFavoriteAction() {
 		var text = "{0} Article ({1})".FormatWith(
-			AppTools.User == null || FavoritesTableRetrieval.GetRowMatchingPk( AppTools.User.UserId, ArticleId, returnNullIfNoMatch: true ) == null
-				? "Favorite"
-				: "Unfavorite",
+			AppTools.User == null || !FavoritesTableRetrieval.TryGetRowMatchingPk( AppTools.User.UserId, ArticleId, out _ ) ? "Favorite" : "Unfavorite",
 			FavoritesTableRetrieval.GetRows( new FavoritesTableEqualityConditions.ArticleId( ArticleId ) ).Count() );
 		var icon = new ActionComponentIcon( new FontAwesomeIcon( "fa-heart" ) );
 
 		return AppTools.User == null
-			       ? (ActionComponentSetup)new HyperlinkSetup( User.GetInfo(), text, icon: icon )
+			       ? new HyperlinkSetup( User.GetInfo(), text, icon: icon )
 			       : new ButtonSetup(
 				       text,
 				       behavior: new PostBackBehavior(
-					       postBack: FavoritesTableRetrieval.GetRowMatchingPk( AppTools.User.UserId, ArticleId, returnNullIfNoMatch: true ) == null
+					       postBack: !FavoritesTableRetrieval.TryGetRowMatchingPk( AppTools.User.UserId, ArticleId, out _ )
 						                 ? PostBack.CreateFull(
 							                 id: "favorite",
 							                 modificationMethod: () => FavoritesModification.InsertRow( AppTools.User.UserId, ArticleId ) )
@@ -133,7 +132,7 @@ partial class Article {
 
 	private CommentsModification getCommentMod() {
 		var mod = CommentsModification.CreateForInsert();
-		mod.AuthorId = AppTools.User.UserId;
+		mod.AuthorId = SystemUser.Current!.UserId;
 		mod.ArticleId = ArticleId;
 		mod.CreationDateAndTime = DateTime.UtcNow;
 		return mod;

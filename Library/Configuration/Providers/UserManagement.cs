@@ -17,7 +17,7 @@ internal class UserManagement: SystemUserManagementProvider {
 				var user = UsersTableRetrieval.GetRows( new UsersTableEqualityConditions.EmailAddress( emailAddress ) ).SingleOrDefault();
 				if( user is null )
 					return null;
-				return ( getUserObject( user ), user.Salt, user.SaltedPassword );
+				return ( getUserObject( user )!, user.Salt, user.SaltedPassword );
 			},
 			userId => {
 				var user = UsersTableRetrieval.GetRowMatchingId( userId );
@@ -43,15 +43,15 @@ internal class UserManagement: SystemUserManagementProvider {
 
 	protected override IEnumerable<SystemUser> GetUsers() => UsersTableRetrieval.GetRows().OrderBy( i => i.Username ).Select( i => getUserObject( i )! );
 
-	protected override SystemUser? GetUser( int userId ) => getUserObject( UsersTableRetrieval.GetRowMatchingId( userId, returnNullIfNoMatch: true ) );
+	protected override SystemUser? GetUser( int userId ) => UsersTableRetrieval.TryGetRowMatchingId( userId, out var user ) ? getUserObject( user ) : null;
 
 	protected override SystemUser? GetUser( string emailAddress ) =>
 		getUserObject( UsersTableRetrieval.GetRows( new UsersTableEqualityConditions.EmailAddress( emailAddress ) ).SingleOrDefault() );
 
 	private SystemUser? getUserObject( UsersTableRetrieval.Row? user ) =>
-		user is null ? null : new SystemUser( user.UserId, user.EmailAddress, getRole(), null, friendlyName: user.Username );
+		user is null ? null : new SystemUser( user.UserId, user.EmailAddress, getRole(), friendlyName: user.Username );
 
-	protected override int InsertOrUpdateUser( int? userId, string emailAddress, int roleId, Instant? lastRequestTime ) {
+	protected override int InsertOrUpdateUser( int? userId, string emailAddress, int roleId ) {
 		if( userId.HasValue ) {
 			var mod = UsersModification.CreateForUpdate( new UsersTableEqualityConditions.UserId( userId.Value ) );
 			mod.EmailAddress = emailAddress;
@@ -69,4 +69,10 @@ internal class UserManagement: SystemUserManagementProvider {
 	protected override IEnumerable<Role> GetRoles() => getRole().ToCollection();
 
 	private Role getRole() => new( 1, "Standard User", false, false );
+
+	protected override IEnumerable<UserRequest> GetUserRequests() => [ ];
+
+	protected override void InsertUserRequest( int userId, Instant requestTime ) {}
+
+	protected override void ClearUserRequests() {}
 }

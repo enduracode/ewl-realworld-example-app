@@ -1,4 +1,5 @@
 ﻿using EnterpriseWebLibrary.EnterpriseWebFramework.UserManagement;
+using EnterpriseWebLibrary.UserManagement;
 using EwlRealWorld.Library.DataAccess;
 using EwlRealWorld.Library.DataAccess.Modification;
 using EwlRealWorld.Library.DataAccess.TableRetrieval;
@@ -14,8 +15,8 @@ partial class User {
 
 	protected override PageContent getContent() {
 		var mod = getMod();
-		Action<int> passwordUpdater = null;
-		AuthenticationStatics.SpecifiedUserLoginModificationMethod specifiedUserLoginMethod = null;
+		Action<int>? passwordUpdater = null;
+		AuthenticationStatics.SpecifiedUserLoginModificationMethod? specifiedUserLoginMethod = null;
 		return FormState.ExecuteWithDataModificationsAndDefaultAction(
 			PostBack.CreateFull(
 					modificationMethod: () => {
@@ -26,7 +27,7 @@ partial class User {
 
 						specifiedUserLoginMethod?.Invoke( mod.UserId );
 					},
-					actionGetter: () => new PostBackAction( specifiedUserLoginMethod != null ? (PageBase)Home.GetInfo() : Profile.GetInfo( AppTools.User.UserId ) ) )
+					actionGetter: () => new PostBackAction( specifiedUserLoginMethod != null ? Home.GetInfo() : Profile.GetInfo( SystemUser.Current!.UserId ) ) )
 				.ToCollection(),
 			() => {
 				var content = new UiPageContent( contentFootActions: new ButtonSetup( AppTools.User != null ? "Update Settings" : "Sign up" ).ToCollection() );
@@ -61,9 +62,9 @@ partial class User {
 		return mod;
 	}
 
-	private FlowComponent getFormItemStack( UsersModification mod, out Action<int> passwordUpdater ) {
+	private FlowComponent getFormItemStack( UsersModification mod, out Action<int>? passwordUpdater ) {
 		var stack = FormItemList.CreateStack();
-		Action<int> passwordUpdaterLocal = null;
+		Action<int>? passwordUpdaterLocal = null;
 
 		if( AppTools.User != null )
 			stack.AddItem( mod.GetProfilePictureUrlUrlControlFormItem( true, label: "URL of profile picture".ToComponents() ) );
@@ -83,7 +84,8 @@ partial class User {
 						setup: FlowCheckboxSetup.Create(
 							nestedContentGetter: () => FormState.ExecuteWithValidationPredicate(
 								() => changePasswordChecked.Value,
-								() => FormItemList.CreateFixedGrid( 1, items: AuthenticationStatics.GetPasswordModificationFormItems( out passwordUpdaterLocal ) )
+								() => FormItemList.CreateFixedGrid( 1 )
+									.AddItems( AuthenticationStatics.GetPasswordModificationFormItems( out passwordUpdaterLocal ) )
 									.ToCollection() ) ),
 						value: false )
 					.ToFormItem() );

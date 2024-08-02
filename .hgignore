@@ -2,8 +2,10 @@
 syntax: glob
 
 .vs/
+EWL RealWorld.sln.DotSettings
 EWL RealWorld.sln.DotSettings.user
 Web Framework Static Files/
+Data Cleaner/
 Error Log.txt
 *.csproj.user
 *.ewlt.cs
@@ -21,6 +23,7 @@ Website/bin/
 Website/obj/
 Website/web.config
 Website/Directory.Build.props
+Website/Directory.Build.targets
 Website/Generated Code/
 Website/Properties/launchSettings.json
 
