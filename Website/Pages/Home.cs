@@ -2,10 +2,9 @@
 using EwlRealWorld.Library.DataAccess.Retrieval;
 using EwlRealWorld.Library.DataAccess.TableRetrieval;
 
-// EwlPage
-
 namespace EwlRealWorld.Website.Pages;
 
+// EwlPage
 partial class Home {
 	protected override IEnumerable<UrlPattern> getChildUrlPatterns() =>
 		RequestDispatchingStatics.GetFrameworkUrlPatterns( WebApplicationNames.Website )
@@ -28,14 +27,14 @@ partial class Home {
 		var resultUpdateRegions = new UpdateRegionSet();
 		content.Add(
 			new GenericFlowContainer(
-				getArticleSection( filter.Value, resultUpdateRegions ).Append( getTagSection( filter.Value, resultUpdateRegions ) ).Materialize(),
+				getArticleSection( filter, resultUpdateRegions ).Append( getTagSection( filter, resultUpdateRegions ) ).Materialize(),
 				classes: ElementClasses.HomeContainer,
 				etherealContent: filter.ToCollection() ) );
 
 		return content;
 	}
 
-	private FlowComponent getArticleSection( DataValue<string> filter, UpdateRegionSet resultUpdateRegions ) =>
+	private FlowComponent getArticleSection( AbstractDataValue<string> filter, UpdateRegionSet resultUpdateRegions ) =>
 		new Section(
 			new LineList(
 					new[]
@@ -44,35 +43,31 @@ partial class Home {
 							}.Where( i => i.Any() )
 						.Select( i => (LineListItem)i.ToComponentListItem() ),
 					verticalAlignment: FlexboxVerticalAlignment.Center ).Append<FlowComponent>(
-					new FlowIdContainer( getResultTable( filter.Value ).ToCollection(), updateRegionSets: resultUpdateRegions.ToCollection() ) )
+					new FlowIdContainer( getResultTable( filter.Value ).ToCollection(), updateRegionSets: resultUpdateRegions ) )
 				.Materialize() );
 
-	private IReadOnlyCollection<PhrasingComponent> getUserTabComponents( DataValue<string> filter, UpdateRegionSet resultUpdateRegions ) {
+	private IReadOnlyCollection<PhrasingComponent> getUserTabComponents( AbstractDataValue<string> filter, UpdateRegionSet resultUpdateRegions ) {
 		const string label = "Your Feed";
 		return AppTools.User != null
 			       ? filter.Value == "user"
 				         ? label.ToComponents()
 				         : new EwfButton(
-					         new StandardButtonStyle( label ),
-					         behavior: new PostBackBehavior(
-						         postBack: PostBack.CreateIntermediate(
-							         resultUpdateRegions.ToCollection(),
-							         id: "user",
-							         modificationMethod: () => filter.Value = "user" ) ) ).ToCollection()
+						         new StandardButtonStyle( label ),
+						         behavior: new PostBackBehavior(
+							         postBack: PostBack.CreateIntermediate( resultUpdateRegions, id: "user", modificationMethod: () => filter.Value = "user" ) ) )
+					         .ToCollection()
 			       : Enumerable.Empty<PhrasingComponent>().Materialize();
 	}
 
-	private IReadOnlyCollection<PhrasingComponent> getGlobalTabComponents( DataValue<string> filter, UpdateRegionSet resultUpdateRegions ) {
+	private IReadOnlyCollection<PhrasingComponent> getGlobalTabComponents( AbstractDataValue<string> filter, UpdateRegionSet resultUpdateRegions ) {
 		const string label = "Global Feed";
 		return filter.Value != "user" && !filter.Value.StartsWith( "tag" )
 			       ? label.ToComponents()
 			       : new EwfButton(
-				       new StandardButtonStyle( label ),
-				       behavior: new PostBackBehavior(
-					       postBack: PostBack.CreateIntermediate(
-						       resultUpdateRegions.ToCollection(),
-						       id: "global",
-						       modificationMethod: () => filter.Value = "global" ) ) ).ToCollection();
+					       new StandardButtonStyle( label ),
+					       behavior: new PostBackBehavior(
+						       postBack: PostBack.CreateIntermediate( resultUpdateRegions, id: "global", modificationMethod: () => filter.Value = "global" ) ) )
+				       .ToCollection();
 	}
 
 	private IReadOnlyCollection<PhrasingComponent> getTagTabComponents( string filter ) =>
@@ -95,7 +90,7 @@ partial class Home {
 		return table;
 	}
 
-	private FlowComponent getTagSection( DataValue<string> filter, UpdateRegionSet resultUpdateRegions ) {
+	private FlowComponent getTagSection( AbstractDataValue<string> filter, UpdateRegionSet resultUpdateRegions ) {
 		var tags = ArticleTagsTableRetrieval.GetRows()
 			.Select( i => i.TagId )
 			.GroupBy( i => i )
@@ -111,7 +106,7 @@ partial class Home {
 						new StandardButtonStyle( i.TagName, buttonSize: ButtonSize.ShrinkWrap ),
 						behavior: new PostBackBehavior(
 							postBack: PostBack.CreateIntermediate(
-								resultUpdateRegions.ToCollection(),
+								resultUpdateRegions,
 								id: PostBack.GetCompositeId( "tag", i.TagId.ToString() ),
 								modificationMethod: () => filter.Value = "tag{0}".FormatWith( i.TagId ) ) ) ).ToComponentListItem() ),
 				generalSetup: new ComponentListSetup( classes: ElementClasses.Tag ) ).ToCollection(),

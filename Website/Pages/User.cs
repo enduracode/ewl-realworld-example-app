@@ -4,10 +4,9 @@ using EwlRealWorld.Library.DataAccess;
 using EwlRealWorld.Library.DataAccess.Modification;
 using EwlRealWorld.Library.DataAccess.TableRetrieval;
 
-// EwlPage
-
 namespace EwlRealWorld.Website.Pages;
 
+// EwlPage
 partial class User {
 	protected override string getResourceName() => AppTools.User != null ? "Your Settings" : "Sign up";
 
@@ -17,18 +16,17 @@ partial class User {
 		var mod = getMod();
 		Action<int>? passwordUpdater = null;
 		AuthenticationStatics.SpecifiedUserLoginModificationMethod? specifiedUserLoginMethod = null;
-		return FormState.ExecuteWithDataModificationsAndDefaultAction(
+		return FormState.ExecuteWithActions(
 			PostBack.CreateFull(
-					modificationMethod: () => {
-						if( AppTools.User == null )
-							mod.UserId = MainSequence.GetNextValue();
-						mod.Execute();
-						passwordUpdater?.Invoke( mod.UserId );
+				modificationMethod: () => {
+					if( AppTools.User == null )
+						mod.UserId = MainSequence.GetNextValue();
+					mod.Execute();
+					passwordUpdater?.Invoke( mod.UserId );
 
-						specifiedUserLoginMethod?.Invoke( mod.UserId );
-					},
-					actionGetter: () => new PostBackAction( specifiedUserLoginMethod != null ? Home.GetInfo() : Profile.GetInfo( SystemUser.Current!.UserId ) ) )
-				.ToCollection(),
+					specifiedUserLoginMethod?.Invoke( mod.UserId );
+				},
+				actionGetter: () => new PostBackAction( specifiedUserLoginMethod != null ? Home.GetInfo() : Profile.GetInfo( SystemUser.Current!.UserId ) ) ),
 			() => {
 				var content = new UiPageContent( contentFootActions: new ButtonSetup( AppTools.User != null ? "Update Settings" : "Sign up" ).ToCollection() );
 
@@ -77,7 +75,7 @@ partial class User {
 		if( AppTools.User == null )
 			stack.AddItems( AuthenticationStatics.GetPasswordModificationFormItems( out passwordUpdaterLocal ) );
 		else {
-			var changePasswordChecked = new DataValue<bool>();
+			var changePasswordChecked = new DataValue<bool>( false );
 			stack.AddItem(
 				changePasswordChecked.ToFlowCheckbox(
 						"Change password".ToComponents(),

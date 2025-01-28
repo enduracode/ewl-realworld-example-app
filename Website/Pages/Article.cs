@@ -7,14 +7,13 @@ using EwlRealWorld.Library.DataAccess.Retrieval;
 using EwlRealWorld.Library.DataAccess.TableRetrieval;
 using Markdig;
 
-// EwlPage
-// Parameter: int articleId
-
 namespace EwlRealWorld.Website.Pages;
 
+// EwlPage
+// Parameter: int articleId
 partial class Article {
-	private ArticlesRetrieval.Row articleRow;
-	private CommentsModification commentMod;
+	private ArticlesRetrieval.Row articleRow = null!;
+	private CommentsModification? commentMod;
 
 	protected override void init() {
 		articleRow = ArticlesRetrieval.GetRowMatchingId( ArticleId );
@@ -50,7 +49,7 @@ partial class Article {
 	private ActionComponentSetup getFavoriteAction() {
 		var text = "{0} Article ({1})".FormatWith(
 			AppTools.User == null || !FavoritesTableRetrieval.TryGetRowMatchingPk( AppTools.User.UserId, ArticleId, out _ ) ? "Favorite" : "Unfavorite",
-			FavoritesTableRetrieval.GetRows( new FavoritesTableEqualityConditions.ArticleId( ArticleId ) ).Count() );
+			FavoritesTableRetrieval.GetRows( new FavoritesTableEqualityConditions.ArticleId( ArticleId ) ).Count );
 		var icon = new ActionComponentIcon( new FontAwesomeIcon( "fa-heart" ) );
 
 		return AppTools.User == null
@@ -86,14 +85,12 @@ partial class Article {
 							var deleteUpdateRegions = new UpdateRegionSet();
 							return new Paragraph( i.BodyText.ToComponents() ).Append( getCommentFooter( i, usersById[ i.AuthorId ], deleteUpdateRegions ) )
 								.Materialize()
-								.ToComponentListItem( i.CommentId.ToString(), removalUpdateRegionSets: deleteUpdateRegions.ToCollection() );
+								.ToComponentListItem( i.CommentId.ToString(), removalUpdateRegionSets: deleteUpdateRegions );
 						} ),
 				setup: new ComponentListSetup(
 					classes: ElementClasses.Comment,
 					itemInsertionUpdateRegions: AppTools.User != null
-						                            ? new ItemInsertionUpdateRegion(
-							                            createUpdateRegions.ToCollection(),
-							                            () => commentMod.CommentId.ToString().ToCollection() ).ToCollection()
+						                            ? new ItemInsertionUpdateRegion( createUpdateRegions, () => commentMod!.CommentId.ToString().ToCollection() )
 						                            : null ) ) );
 
 		return components;
@@ -110,15 +107,14 @@ partial class Article {
 					.Materialize() ).ToCollection();
 
 		commentMod = getCommentMod();
-		return FormState.ExecuteWithDataModificationsAndDefaultAction(
+		return FormState.ExecuteWithActions(
 			PostBack.CreateIntermediate(
-					createUpdateRegions.ToCollection(),
-					id: "comment",
-					modificationMethod: () => {
-						commentMod.CommentId = MainSequence.GetNextValue();
-						commentMod.Execute();
-					} )
-				.ToCollection(),
+				createUpdateRegions,
+				id: "comment",
+				modificationMethod: () => {
+					commentMod.CommentId = MainSequence.GetNextValue();
+					commentMod.Execute();
+				} ),
 			() => new FlowIdContainer(
 				commentMod.GetBodyTextTextControlFormItem(
 						false,
@@ -127,7 +123,7 @@ partial class Article {
 						value: "" )
 					.ToComponentCollection()
 					.Append( new EwfButton( new StandardButtonStyle( "Post Comment" ) ) ),
-				updateRegionSets: createUpdateRegions.ToCollection() ).ToCollection() );
+				updateRegionSets: createUpdateRegions ).ToCollection() );
 	}
 
 	private CommentsModification getCommentMod() {
@@ -158,7 +154,7 @@ partial class Article {
 								new StandardButtonStyle( "Delete", icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-trash" ) ) ),
 								behavior: new PostBackBehavior(
 									postBack: PostBack.CreateIntermediate(
-										deleteUpdateRegions.ToCollection(),
+										deleteUpdateRegions,
 										id: PostBack.GetCompositeId( "delete", comment.CommentId.ToString() ),
 										modificationMethod: () => CommentsModification.DeleteRows( new CommentsTableEqualityConditions.CommentId( comment.CommentId ) ) ) ) )
 							.ToCollection()

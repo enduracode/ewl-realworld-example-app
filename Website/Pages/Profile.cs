@@ -1,14 +1,13 @@
 ﻿using EwlRealWorld.Library.DataAccess.Retrieval;
 using EwlRealWorld.Library.DataAccess.TableRetrieval;
 
+namespace EwlRealWorld.Website.Pages;
+
 // EwlPage
 // Parameter: int userId
 // OptionalParameter: bool showFavorites
-
-namespace EwlRealWorld.Website.Pages;
-
 partial class Profile {
-	private UsersTableRetrieval.Row user;
+	private UsersTableRetrieval.Row user = null!;
 
 	protected override void init() {
 		user = UsersTableRetrieval.GetRowMatchingId( UserId );

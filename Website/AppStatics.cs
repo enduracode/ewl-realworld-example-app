@@ -57,7 +57,7 @@ internal static class AppStatics {
 				new StandardButtonStyle( count, icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-heart-o" ) ) ),
 				behavior: new PostBackBehavior(
 					postBack: PostBack.CreateIntermediate(
-						rs.ToCollection(),
+						rs,
 						id: PostBack.GetCompositeId( "favorite", article.ArticleId.ToString() ),
 						modificationMethod: () => FavoritesModification.InsertRow( AppTools.User.UserId, article.ArticleId ) ) ) );
 		else
@@ -65,12 +65,12 @@ internal static class AppStatics {
 				new StandardButtonStyle( count, icon: new ActionComponentIcon( new FontAwesomeIcon( "fa-heart" ) ) ),
 				behavior: new PostBackBehavior(
 					postBack: PostBack.CreateIntermediate(
-						rs.ToCollection(),
+						rs,
 						id: PostBack.GetCompositeId( "unfavorite", article.ArticleId.ToString() ),
 						modificationMethod: () => FavoritesModification.DeleteRows(
 							new FavoritesTableEqualityConditions.UserId( AppTools.User.UserId ),
 							new FavoritesTableEqualityConditions.ArticleId( article.ArticleId ) ) ) ) );
-		return new PhrasingIdContainer( button.ToCollection(), updateRegionSets: rs.ToCollection() );
+		return new PhrasingIdContainer( button.ToCollection(), updateRegionSets: rs );
 	}
 
 	internal static IReadOnlyCollection<FlowComponent> GetTagDisplay( int articleId, IEnumerable<ArticleTagsTableRetrieval.Row> tags ) =>

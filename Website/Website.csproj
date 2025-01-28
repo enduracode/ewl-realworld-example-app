@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
-    <PackageReference Include="Ewl" Version="81.0.0" />
+    <PackageReference Include="Ewl" Version="82.0.0" />
     <PackageReference Include="Markdig" Version="0.30.4" />
   </ItemGroup>
 
